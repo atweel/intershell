@@ -1,5 +1,8 @@
 {
     "references": [
         { "path": "packages/intershell" }
+    ],
+    "exclude": [
+        "*"
     ]
 }

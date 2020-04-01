@@ -5,6 +5,8 @@ const path = require('path');
 
 const tsConfigPath = path.join(process.cwd(), 'tsconfig');
 
+console.log(`tsconfig path: ${ tsConfigPath }`);
+
 const { compilerOptions } = require(tsConfigPath);
 
 module.exports = {

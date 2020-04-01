@@ -1,0 +1,15 @@
+{
+    "compilerOptions": {
+      "outDir": "./library",                   
+      "rootDir": ".",                  
+      "baseUrl": ".",
+      "paths": {
+        "intershell": ["packages/intershell"]
+      }
+    },
+    "include": [
+      "sources/**/*.ts",
+      "tests/**/*.ts"
+    ]
+  }
+  

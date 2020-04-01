@@ -1,7 +1,7 @@
 import { exec, execSync, ExecOptions,ExecSyncOptions, ExecException, ChildProcess } from 'child_process';
 import 'reflect-metadata';
 
-import { DEFAULT_INTERPRETER, SUPPORTED_INTERPRETERS, TAG_FUNCTION_METADATA_KEY } from './../../constants';
+import { DEFAULT_INTERPRETER, SUPPORTED_INTERPRETERS, TAG_FUNCTION_METADATA_KEY } from '../../constants';
 
 type ShellInvocationMode = 'sync' | 'async';
 

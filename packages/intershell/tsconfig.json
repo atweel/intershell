@@ -1,15 +1,18 @@
 {
     "extends": "../../default.tsconfig.json",
     "compilerOptions": {
-      "outDir": "./lib",                   
-      "rootDir": "./src",                  
-      "baseUrl": "./src"                   
+      "outDir": "./library/",                   
+      "rootDir": "sources/",                  
+      "baseUrl": "sources/",
+      "paths": {
+        "self": ["exports"]
+      }
     },
     "include": [
-      "src/**/*.ts"
+      "sources/**/*.ts"
     ],
     "exclude": [
-      "src/**/*/spec.ts"
+      "sources/**/*/spec.ts"
     ]
   }
   

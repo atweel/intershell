@@ -14,7 +14,9 @@
     "debug:showcase": "ts-node-dev --respawn --inspect -- showcase",
     "lint": "eslint --ext .ts .",
     "lint:fix": "yarn lint --fix",
-    "test": "lerna exec jest -- \\$PWD --config \\$LERNA_ROOT_PATH/jest.config.js --passWithNoTests",
+    "test": "yarn test:unit && yarn test:integration",
+    "test:unit": "lerna exec jest -- \\$PWD/sources --config \\$LERNA_ROOT_PATH/jest.config.js --passWithNoTests",
+    "test:integration": "cd tests && yarn jest $PWD --config $PWD/../jest.config.js --passWithNoTests --debug",
     "integrate": "yarn clean && yarn lint && yarn build && yarn test",
     "prepack": "yarn lint && yarn rebuild && yarn test"
   },
