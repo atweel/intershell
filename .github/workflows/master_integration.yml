@@ -1,0 +1,68 @@
+# This workflow will do a clean install of node dependencies, build the source code and run tests across different versions of node
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
+
+name: Integrate master branch
+
+on:
+  push:
+    branches: [master]
+
+jobs:
+  integrate:
+    name: Integrate
+    
+    runs-on: ubuntu-latest
+
+    env:
+      CI: true
+      NPM_AUTH_TOKEN: ${{ secrets.NPMJS_ORG_READER_TOKEN }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Use Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12.x
+
+      - name: Configure git
+        run: |
+          git config --global user.email "robby@atweel.com" && \
+          git config --global user.name "Robby Atweel"
+
+      - name: Configure npm
+        run: echo "//registry.npmjs.org/:_authToken=\${NPM_AUTH_TOKEN}" > .npmrc
+
+      - name: Resolve yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(yarn cache dir)"
+
+      - name: Configure yarn cache
+        uses: actions/cache@v1
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+
+      - name: Install dependencies & bootstrap packages
+        run: |
+          yarn install -W --frozen-lockfile && \
+          yarn lerna bootstrap -- -- --frozen-lockfile
+
+      - name: Increment prerelease version if no version tag assigned
+        if: github.event_name == 'push'
+        run: |
+          git fetch --tags --quiet
+          if [[ $(git tag --points-at HEAD) !=  "v"* ]]; 
+            then yarn lerna version prerelease --yes --preid alpha --no-commit-hooks --no-push
+          fi
+
+      - name: Integrate packages
+        run: yarn integrate
+
+      - name: Push version update and tag
+        if: github.event_name == 'push'
+        run: git push --tags && git push
+
