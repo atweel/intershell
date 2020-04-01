@@ -1,0 +1,42 @@
+{
+  "name": "@atweel/intershell",
+  "version": "1.0.0-alpha.0",
+  "description": "> TODO: description",
+  "author": "Eduard Malakhov <eduard@atweel.com>",
+  "homepage": "https://github.com/atweel/intershell#readme",
+  "license": "ISC",
+  "main": "lib/exports.ts",
+  "directories": {
+    "lib": "lib",
+    "test": "__tests__"
+  },
+  "files": [
+    "lib"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/atweel/intershell.git"
+  },
+  "scripts": {
+    "test": "echo \"Error: run tests from root\" && exit 1"
+  },
+  "bugs": {
+    "url": "https://github.com/atweel/intershell/issues"
+  },
+  "devDependencies": {
+    "@types/jest": "^25.1.4",
+    "@typescript-eslint/eslint-plugin": "^2.24.0",
+    "@typescript-eslint/parser": "^2.24.0",
+    "eslint": "^6.8.0",
+    "jest": "^25.2.4",
+    "typemoq": "^2.1.0",
+    "typescript": "^3.8.3",
+    "typescript-eslint": "^0.0.1-alpha.0"
+  },
+  "dependencies": {
+    "reflect-metadata": "^0.1.13"
+  }
+}

@@ -4,7 +4,7 @@
   "scripts": {
     "build": "yarn build:packages && yarn build:showcase",
     "build:packages": "ttsc --build packages.tsconfig.json",
-    "build:showcase": "ttsc --build showcase/tsconfig.json",
+    "build:showcase": "true || ttsc --build showcase/tsconfig.json",
     "watch": "ttsc --build --watch packages.tsconfig.json",
     "clean": "yarn clean:internals && yarn clean:common",
     "clean:internals": "lerna run clean --parallel",

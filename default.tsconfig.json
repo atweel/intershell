@@ -1,0 +1,15 @@
+{
+    "compilerOptions": {
+      "target": "es2018",                   
+      "module": "commonjs",                 
+      "declaration": true,                  
+      "sourceMap": true,                    
+      "composite": true,                    
+      "strict": true,                       
+      "esModuleInterop": true,              
+      "experimentalDecorators": true,       
+      "emitDecoratorMetadata": true,        
+      "forceConsistentCasingInFileNames": true
+    }
+  }
+  
