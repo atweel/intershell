@@ -9,14 +9,30 @@ type ShellExecOptions<M extends ShellInvocationMode> = Omit<M extends 'sync' ? E
 
 type ExecAsyncCallback = (error: ExecException | null, stdout: string | Buffer, stderr: string | Buffer) => void;
 
-interface ShellCommandFunction {
-    (options?: ShellExecOptions<'async'>, callback?: ExecAsyncCallback): ChildProcess;
-    execSync(options?: ShellExecOptions<'sync'>): Buffer;
-    execAsync(options?: ShellExecOptions<'async'>, callback?: ExecAsyncCallback): ChildProcess;
+type ShellArgument = number | string | boolean | undefined | null;
+
+interface ShellArguments {
+    [key: string]: ShellArgument;
 }
 
-interface ShellTagFunction {
-    (strings: TemplateStringsArray, ...parameters: any[]): ShellCommandFunction;
+type ShellArgumentSelectorExpression<A> = (a: A) => ShellArgument;
+type ShellArgumentIndexerExpression<A> = [keyof A];
+type ShellArgumentExpression<A> = ShellArgumentSelectorExpression<A> | ShellArgumentIndexerExpression<A>;
+
+type ShellArgumentBinding<A> = ShellArgument | ShellArgumentExpression<A>;
+
+type ScriptExecutionParameters<M extends ShellInvocationMode, A extends ShellArguments> = A & {
+    options?: ShellExecOptions<M>;
+}
+
+interface ShellCommandFunction<A extends ShellArguments> {
+    (parameters?: ScriptExecutionParameters<'async', A>, callback?: ExecAsyncCallback): ChildProcess;
+    execSync(parameters?: ScriptExecutionParameters<'sync', A>): Buffer;
+    execAsync(parameters?: ScriptExecutionParameters<'async', A>, callback?: ExecAsyncCallback): ChildProcess;
+}
+
+interface ShellTagFunction<A extends ShellArguments> {
+    (strings: TemplateStringsArray, ...parameters: any[]): ShellCommandFunction<A>;
 }
 
 function assertTypeTemplateStringsArray(obj: any): asserts obj is TemplateStringsArray {
@@ -25,24 +41,43 @@ function assertTypeTemplateStringsArray(obj: any): asserts obj is TemplateString
     }
 }
 
-function shell(interpreter: string): ShellTagFunction;
-function shell(interpreter: string, mode: ShellInvocationMode): ShellTagFunction;
-function shell(strings: TemplateStringsArray, ...parameters: any[]): ShellCommandFunction;
-function shell(arg1: string | TemplateStringsArray, ...parameters: any[]): ShellTagFunction | ShellCommandFunction {
+function shell<A extends ShellArguments = {}>(interpreter: string): ShellTagFunction<A>;
+function shell<A extends ShellArguments = {}>(interpreter: string, mode: ShellInvocationMode): ShellTagFunction<A>;
+function shell<A extends ShellArguments = {}>(strings: TemplateStringsArray, ...bindings: ShellArgumentBinding<A>[]): ShellCommandFunction<A>;
+function shell<A extends ShellArguments = {}>(arg1: string | TemplateStringsArray, ...bindings: ShellArgumentBinding<A>[]): ShellTagFunction<A> | ShellCommandFunction<A> {
     if (typeof arg1 === 'string') {
-        const tagFunction = (strings: TemplateStringsArray, ...parameters: any[]): ShellCommandFunction => {
-            assertTypeTemplateStringsArray(strings);
+        const tagFunction = (scriptParts: TemplateStringsArray, ...bindings: ShellArgumentBinding<A>[]): ShellCommandFunction<A> => {
+            assertTypeTemplateStringsArray(scriptParts);
 
-            const script = strings
-                .map((str, index) => str + (parameters[index] || '' ))
-                .join('');
+            const expressions: ShellArgumentSelectorExpression<A>[] = bindings
+                .map((binding) => typeof binding === 'function' 
+                    ? binding 
+                    : Array.isArray(binding) 
+                        ? (a: A): ShellArgument => a[binding[0]] 
+                        : (): ShellArgument => binding);
 
-            const syncCommandFunction = (options?: ExecSyncOptions): Buffer => {
-                return execSync(script, options);
+            const compileScript = (parameters?: ScriptExecutionParameters<'sync', A>): string => {
+                const resolveArgument = (index: number): string => {
+                    let value = '' + (parameters && expressions[index]?.(parameters) || '');
+
+                    if (value.includes('"')) {
+                        value = value.replace(/"/g, '\\"');
+                    }
+
+                    return value.includes(' ') ? `"${ value }"` : value;
+                };
+                
+                return scriptParts
+                    .map((str, index) => str + resolveArgument(index))
+                    .join('');
             };
 
-            const asyncCommandFunction = (options?: ExecOptions, callback?: ExecAsyncCallback): ChildProcess => {
-                return exec(script, { ...options, shell: arg1 }, callback);
+            const syncCommandFunction = (parameters?: ScriptExecutionParameters<'sync', A>): Buffer => {
+                return execSync(compileScript(parameters), parameters?.options);
+            };
+
+            const asyncCommandFunction = (parameters?: ScriptExecutionParameters<'async', A>, callback?: ExecAsyncCallback): ChildProcess => {               
+                return exec(compileScript(parameters), { ...parameters?.options, shell: arg1 }, callback);
             };
 
             return Object.assign(asyncCommandFunction, {
@@ -55,7 +90,7 @@ function shell(arg1: string | TemplateStringsArray, ...parameters: any[]): Shell
 
         return tagFunction;
     } else {
-        return shell(DEFAULT_INTERPRETER)(arg1, ...parameters);
+        return shell(DEFAULT_INTERPRETER)(arg1, ...bindings);
     }
 }
 
