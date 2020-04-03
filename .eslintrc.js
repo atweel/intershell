@@ -29,8 +29,11 @@ module.exports = {
       "FunctionDeclaration": {"parameters": "first"},
       "FunctionExpression": {"parameters": "first"},
       "CallExpression": {"arguments": "first"},
+      "MemberExpression": 1,
+      "flatTernaryExpressions": true,
       "SwitchCase": 1
     }],
+    "no-trailing-spaces": "error",
     "template-tag-spacing": ["error", "never"],
     "template-curly-spacing": ["error", "always"],
     "object-curly-spacing": ["error", "always"],

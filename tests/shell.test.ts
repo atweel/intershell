@@ -1,15 +1,16 @@
 import 'jest';
+import { promisify } from 'util';
 
 import { shell, SUPPORTED_INTERPRETERS } from 'intershell';
 
 describe(`'${ shell.name }' template literal tag...`, function () {
     describe('...when applied without parameters...', function () {
-        it('...executes a trivial multiline script', function () {
+        it('...executes a multiline script without substitutions', function () {
             const script = shell`
                 echo "message 1"
                 echo "message 2"
             `;
-    
+
             return new Promise((resolve, reject) => {
                 script({}, (error, stdout) => {
                     if (error) {
@@ -17,40 +18,61 @@ describe(`'${ shell.name }' template literal tag...`, function () {
                     }
 
                     const output = stdout.toString();
-    
+
                     expect(output).toContain('message 1');
                     expect(output).toContain('message 2');
-    
+
                     resolve();
-                });    
+                });
             });
         });
 
-        it('...executes a script with template parameter', function () {
+        it('...executes a script with a template parameter and empty options', function () {
             const message = 'message';
 
             const script = shell`
                 echo ${ message }
             `;
-    
+
             return new Promise((resolve, reject) => {
                 script({}, (error, stdout) => {
                     if (error) {
                         reject(error);
                     }
-    
+
                     expect(stdout.toString()).toContain(message);
-    
+
                     resolve();
-                });    
+                });
             });
         });
 
-        it('...executes a script with environment variable', function () {
+        it('...executes a script without options or parameters', function () {
+            const message = 'message';
+
+            const script = shell`
+                # without options or parameters
+                echo ${ message }
+            `;
+
+            return new Promise((resolve, reject) => {
+                script((error, stdout) => {
+                    if (error) {
+                        reject(error);
+                    }
+
+                    expect(stdout.toString()).toContain(message);
+
+                    resolve();
+                });
+            });
+        });
+
+        it('...executes a script with an environment variable', function () {
             const script = shell`
                 echo $MESSAGE
             `;
-    
+
             return new Promise((resolve, reject) => {
                 script({
                     options: {
@@ -62,11 +84,27 @@ describe(`'${ shell.name }' template literal tag...`, function () {
                     if (error) {
                         reject(error);
                     }
-    
+
                     expect(stdout.toString()).toContain('message');
-    
+
                     resolve();
-                });    
+                });
+            });
+        });
+
+        it('...is compatible with promisify', async function () {
+            const script = shell`
+                echo $MESSAGE
+            `;
+
+            return promisify(script)({
+                options: {
+                    env: {
+                        MESSAGE: 'message',
+                    },
+                },
+            }).then((stdout) => {
+                expect(stdout.toString()).toContain('message');
             });
         });
 
@@ -102,11 +140,11 @@ describe(`'${ shell.name }' template literal tag...`, function () {
                     if (error) {
                         reject(error);
                     }
-    
+
                     expect(stdout.toString()).toContain('message');
-    
+
                     resolve();
-                });    
+                });
             });
         });
 
@@ -144,14 +182,14 @@ describe(`'${ shell.name }' template literal tag...`, function () {
                     }
 
                     const output = stdout.toString();
-    
+
                     expect(output).toContain(argumentValues.numeric.toString());
                     expect(output).toContain(argumentValues.word);
                     expect(output).toContain(argumentValues.sentence);
                     expect(output).toContain(argumentValues.quoted);
-    
+
                     resolve();
-                });    
+                });
             });
         });
 
@@ -189,14 +227,14 @@ describe(`'${ shell.name }' template literal tag...`, function () {
                     }
 
                     const output = stdout.toString();
-    
+
                     expect(output).toContain(argumentValues.numeric.toString());
                     expect(output).toContain(argumentValues.word);
                     expect(output).toContain(argumentValues.sentence);
                     expect(output).toContain(argumentValues.quoted);
-    
+
                     resolve();
-                });    
+                });
             });
         });
     });
@@ -205,15 +243,15 @@ describe(`'${ shell.name }' template literal tag...`, function () {
         for (const interpreter of SUPPORTED_INTERPRETERS) {
             it(`...executes a script via ${ interpreter }`, function () {
                 const script = shell(interpreter)`echo SHELL = $0`;
-        
+
                 return new Promise((resolve, reject) => {
                     script({}, (error, stdout) => {
                         if (error) {
                             reject(error);
                         }
-        
+
                         expect(stdout.toString()).toMatch(new RegExp(`SHELL = ${ interpreter }`));
-        
+
                         resolve();
                     });
                 });

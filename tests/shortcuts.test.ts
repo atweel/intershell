@@ -5,10 +5,10 @@ import * as shells from 'intershell';
 const shortcuts = Object.entries(shells)
     .filter(([ name, value ]) => typeof value === 'function' && name !== 'shell')
     .filter(([ , value ]) => Reflect.hasMetadata(shells.TAG_FUNCTION_METADATA_KEY, value))
-    .map(([ name, value ]) => ({ 
-        name, 
-        tag: value, 
-        metadata: Reflect.getMetadata(shells.TAG_FUNCTION_METADATA_KEY, value), 
+    .map(([ name, value ]) => ({
+        name,
+        tag: value,
+        metadata: Reflect.getMetadata(shells.TAG_FUNCTION_METADATA_KEY, value),
     }));
 
 
@@ -21,15 +21,15 @@ for (const shortcut of shortcuts) {
                 }
 
                 const script = shortcut.tag`echo SHELL = $0`;
-            
+
                 return new Promise((resolve, reject) => {
                     script({}, (error, stdout) => {
                         if (error) {
                             reject(error);
                         }
-        
+
                         expect(stdout.toString()).toMatch(new RegExp(`SHELL = ${ shortcut.metadata.interpreter }`));
-        
+
                         resolve();
                     });
                 });
