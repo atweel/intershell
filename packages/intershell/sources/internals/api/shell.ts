@@ -26,7 +26,7 @@ interface ShellArguments {
     [key: string]: ShellArgument;
 }
 
-type ShellArgumentSelectorExpression<A> = (a: A) => ShellArgument;
+type ShellArgumentSelectorExpression<A> = (a: A | undefined) => ShellArgument;
 type ShellArgumentIndexerExpression<A> = [keyof A];
 type ShellArgumentExpression<A> = ShellArgumentSelectorExpression<A> | ShellArgumentIndexerExpression<A>;
 
@@ -42,6 +42,7 @@ interface ShellCommandFunction<A extends ShellArguments> extends CustomPromisify
     (callback?: ExecAsyncCallback): ChildProcess;
     (parameters?: ScriptExecutionParameters<'async', A>, callback?: ExecAsyncCallback): ChildProcess;
     execSync(parameters?: ScriptExecutionParameters<'sync', A>): Buffer;
+    execAsync(callback?: ExecAsyncCallback): ChildProcess;
     execAsync(parameters?: ScriptExecutionParameters<'async', A>, callback?: ExecAsyncCallback): ChildProcess;
 }
 
@@ -69,12 +70,12 @@ function shell<A extends ShellArguments = {}>(arg1: string | TemplateStringsArra
                 .map((binding) => typeof binding === 'function'
                     ? binding
                     : Array.isArray(binding)
-                        ? (args: A): ShellArgument => args[binding[0]]
+                        ? (args: A | undefined): ShellArgument => args?.[binding[0]]
                         : (): ShellArgument => binding);
 
             const compileScript = (parameters?: ScriptExecutionParameters<'sync', A>): string => {
                 const resolveArgument = (index: number): string => {
-                    let value = '' + (parameters && expressions[index]?.(parameters) || '');
+                    let value = '' + (expressions[index]?.(parameters) || '');
 
                     if (value.includes('"')) {
                         value = value.replace(/"/g, '\\"');
@@ -85,11 +86,12 @@ function shell<A extends ShellArguments = {}>(arg1: string | TemplateStringsArra
 
                 return scriptParts
                     .map((str, index) => str + resolveArgument(index))
-                    .join('');
+                    .join('')
+                    .trim();
             };
 
             function syncCommandFunction(parameters?: ScriptExecutionParameters<'sync', A>): Buffer {
-                return execSync(compileScript(parameters), parameters?.options);
+                return execSync(compileScript(parameters), { ...parameters?.options, shell: interpreter });
             }
 
             function asyncCommandFunction(callback?: ExecAsyncCallback): ChildProcess;
@@ -99,15 +101,24 @@ function shell<A extends ShellArguments = {}>(arg1: string | TemplateStringsArra
                 if (args.length === 2) {
                     const script = compileScript(args[0]);
 
-                    debug(`Executing script '${ script.split('\n')[0] }..." in asyncronous mode with a callback...`);
+                    debug(`Executing script '${ script.split('\n')[0] }...'" in asyncronous mode with a callback...`);
 
                     return exec(script, { ...args[0]?.options, shell: interpreter }, args[1]);
                 } else {
-                    const script = compileScript(args[0]);
+                    if (typeof args[0] === 'object') {
+                        const script = compileScript(args[0]);
 
-                    debug(`Executing script '${ script.split('\n')[0] }..." in asyncronous mode with a callback...`);
+                        debug(`Executing script '${ script.split('\n')[0] }...'" in asyncronous mode without a callback...`);
 
-                    return exec(script, { shell: interpreter }, args[0]);
+                        return exec(script, { shell: interpreter });
+                    } else {
+                        const script = compileScript();
+
+                        debug(`Executing script '${ script.split('\n')[0] }...'" in asyncronous mode with a callback...`);
+
+                        return exec(script, { shell: interpreter }, args[0]);
+                    }
+
                 }
             }
 

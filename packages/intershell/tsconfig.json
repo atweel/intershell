@@ -5,7 +5,7 @@
       "rootDir": "sources/",                  
       "baseUrl": "sources/",
       "paths": {
-        "self": ["exports"]
+        "constants": ["constants"]
       }
     },
     "include": [

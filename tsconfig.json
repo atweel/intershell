@@ -3,6 +3,7 @@
       "outDir": "./library",                   
       "rootDir": ".",                  
       "baseUrl": ".",
+      "esModuleInterop": true,
       "paths": {
         "intershell": ["packages/intershell"]
       }
