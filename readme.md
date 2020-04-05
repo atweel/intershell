@@ -58,22 +58,8 @@ script((error, stdout) => {
 
 By default, Intershell scripts are executed asynchronously. To support synchronous execution, Intershell script function exposes a method called `execSync` which would start the interpreter in s separate process, wait for it to finish execution, and return the output as a `Buffer` or a `string` similarly to the `execSync` API from the standard Node.js `child_process` package. 
 
-```typescript
-import { shell } from 'intershell';
-
-const name = 'Robby';
-
-const script = shell`echo "Hello from ${ name }!"`;
-
-const output = script.execSync();
-
-console.log(output.toString());
-```
-
-Output:
-```shell
-# TBD
-```
+<!---example:synchronous:begin--->
+<!---example:synchronous:end--->
 
 For the sake of API symmetry, Intershell script functions also expose the `execAsync` method which does exactly the same as the direct invocation.
 
