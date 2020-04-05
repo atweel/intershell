@@ -1,3 +1,5 @@
+![Validation on master](https://github.com/atweel/intershell/workflows/Integrate%20master%20branch/badge.svg?branch=master&event=push)
+
 # Intershell
 
 ## About
@@ -59,19 +61,50 @@ script((error, stdout) => {
 By default, Intershell scripts are executed asynchronously. To support synchronous execution, Intershell script function exposes a method called `execSync` which would start the interpreter in s separate process, wait for it to finish execution, and return the output as a `Buffer` or a `string` similarly to the `execSync` API from the standard Node.js `child_process` package. 
 
 <!---example:synchronous:begin--->
+```typescript
+// Source code:
+import { shell } from '@atweel/intershell';
+
+const name = 'Robby';
+
+const script = shell`
+    echo "Hello ${ name }!"
+`;
+
+const output = script.execSync().toString();
+
+console.log(output);
+
+// Output:
+// Hello Robby!
+```
 <!---example:synchronous:end--->
 
 For the sake of API symmetry, Intershell script functions also expose the `execAsync` method which does exactly the same as the direct invocation.
 
+<!---example:asynchronous-explicit:begin--->
 ```typescript
-import { shell } from 'intershell';
+// Source code:
+import { shell } from '@atweel/intershell';
 
 const name = 'Robby';
 
-const script = shell`echo "Hello from ${ name }!"`;
+const script = shell`
+    echo "Hello ${ name }!"
+`;
 
-script.execAsync();
+script.execAsync((error, stdout) => {
+    if (error) {
+        console.error(`Intershell script execution failed. ${ error }`);
+    } else {
+        console.log(stdout);
+    }
+});
+
+// Output:
+// Hello Robby!
 ```
+<!---example:asynchronous-explicit:end--->
 
 ### Support for promises
 
