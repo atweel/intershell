@@ -11,6 +11,27 @@ Intershell leverages the power of ES2015 [tagged template literals](https://deve
 The easiest way of including a shell script into your code with Intershell is to write it as a template literal and apply the `shell` tag available from the Intershell package like this:
 
 <!---example:basic:begin--->
+```typescript
+// Source code:
+import { shell } from '@atweel/intershell';
+
+const name = 'Robby';
+
+const script = shell`
+    echo "Hello ${ name }!"
+`;
+
+script((error, stdout) => {
+    if (error) {
+        console.error(`Intershell script execution failed. ${ error }`);
+    } else {
+        console.log(stdout);
+    }
+});
+
+// Output:
+// Hello Robby!
+```
 <!---example:basic:end--->
 
 Applying the `shell` tag to a template literal produces a function, invoking which will asynchronously execute the shell script defined by the template literal using the `/bin/sh` interpreter by default. Script function accepts zero to two arguments, the last one being a callback that will be called when the script exits. When invoked, the callback will be passed two arguments: an error (`null` if the script exits with code zero) and a string containing the ouput that the script has produced. The script function returns an instance of [`ChildProcess`](https://nodejs.org/dist/latest-v12.x/docs/api/child_process.html#child_process_class_childprocess) similarly to the `exec` API from the standard Node.js `child_process` package.
