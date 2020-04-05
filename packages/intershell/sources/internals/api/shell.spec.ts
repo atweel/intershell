@@ -61,7 +61,7 @@ describe('shell function', () => {
             it('to the execSync function in sync mode', () => {
                 const interpreter = '/bin/interpreter';
 
-                const tagFunction = shell(interpreter);
+                const tagFunction = shell<{ a?: string }>(interpreter);
 
                 const script = tagFunction`echo "message"`;
 

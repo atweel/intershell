@@ -15,10 +15,11 @@
     "lint": "eslint --ext .ts .",
     "lint:fix": "yarn lint --fix",
     "test": "yarn test:unit && yarn test:integration",
-    "test:unit": "lerna exec jest -- \\$PWD/sources --config \\$LERNA_ROOT_PATH/jest.config.js --passWithNoTests",
+    "test:unit": "lerna exec --ignore @atweel/intershell-primer jest -- \\$PWD/sources --config \\$LERNA_ROOT_PATH/jest.config.js --passWithNoTests",
     "test:integration": "DEBUG=intershell yarn build && cd tests && yarn jest $PWD --config $PWD/../jest.config.js --passWithNoTests",
     "integrate": "yarn clean && yarn lint && yarn build && yarn test",
-    "prepack": "yarn lint && yarn rebuild && yarn test"
+    "prepack": "yarn lint && yarn rebuild && yarn test",
+    "primer": "cd packages/primer && ts-node sources/entrypoint.ts"
   },
   "workspaces": [
     "packages/**/*",

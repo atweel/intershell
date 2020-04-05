@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
     exec,
     execSync,
@@ -36,15 +37,44 @@ type ScriptExecutionParameters<M extends ShellInvocationMode, A extends ShellArg
     options?: ShellExecOptions<M>;
 }
 
-type ShellCommandFunctionWithPromise<A extends ShellArguments> = (parameters?: ScriptExecutionParameters<'async', A>) => Promise<string | Buffer>;
+type PromisifySymbol<A extends ShellArguments> = Partial<A> extends A
+    ? CustomPromisifySymbol<{
+        (): Promise<string | Buffer>;
+        (parameters: ScriptExecutionParameters<'async', A>): Promise<string | Buffer>;
+    }> : CustomPromisifySymbol<{
+        (parameters: ScriptExecutionParameters<'async', A>): Promise<string | Buffer>;
+    }>
 
-interface ShellCommandFunction<A extends ShellArguments> extends CustomPromisifySymbol<ShellCommandFunctionWithPromise<A>> {
-    (callback?: ExecAsyncCallback): ChildProcess;
-    (parameters?: ScriptExecutionParameters<'async', A>, callback?: ExecAsyncCallback): ChildProcess;
-    execSync(parameters?: ScriptExecutionParameters<'sync', A>): Buffer;
-    execAsync(callback?: ExecAsyncCallback): ChildProcess;
-    execAsync(parameters?: ScriptExecutionParameters<'async', A>, callback?: ExecAsyncCallback): ChildProcess;
+type AsynchronousShellCommandFunction<A extends ShellArguments> = Partial<A> extends A
+    ? {
+        (callback?: ExecAsyncCallback): ChildProcess;
+        (parameters: ScriptExecutionParameters<'async', A>, callback?: ExecAsyncCallback): ChildProcess;
+    } & PromisifySymbol<A>
+    : {
+        (parameters: ScriptExecutionParameters<'async', A>, callback?: ExecAsyncCallback): ChildProcess;
+    } & PromisifySymbol<A>
+
+type SynchronousShellCommandFunction<A extends ShellArguments> = Partial<A> extends A
+    ? {
+        (): Buffer;
+        (parameters: ScriptExecutionParameters<'sync', A>): Buffer;
+    } : {
+        (parameters: ScriptExecutionParameters<'sync', A>): Buffer;
+    }
+
+type ShellCommandFunction<A extends ShellArguments> = AsynchronousShellCommandFunction<A> & {
+    execSync: SynchronousShellCommandFunction<A>;
+    execAsync: AsynchronousShellCommandFunction<A>;
 }
+
+// interface ShellCommandFunction<A extends ShellArguments> extends CustomPromisifySymbol<ShellCommandFunctionWithPromise<A>> {
+//     (callback?: ExecAsyncCallback): Optional<A> extends A ? ChildProcess : never;
+//     (parameters: ScriptExecutionParameters<'async', A>, callback?: ExecAsyncCallback): ChildProcess;
+//     execSync(): Optional<A> extends A ? Buffer : never;
+//     execSync(parameters: ScriptExecutionParameters<'sync', A>): Buffer;
+//     execAsync(callback?: ExecAsyncCallback): Optional<A> extends A ? ChildProcess : never;
+//     execAsync(parameters: ScriptExecutionParameters<'async', A>, callback?: ExecAsyncCallback): ChildProcess;
+// }
 
 interface ShellTagFunction<A extends ShellArguments> {
     (strings: TemplateStringsArray, ...parameters: any[]): ShellCommandFunction<A>;
@@ -90,13 +120,14 @@ function shell<A extends ShellArguments = {}>(arg1: string | TemplateStringsArra
                     .trim();
             };
 
+            function syncCommandFunction(): Buffer;
+            function syncCommandFunction(parameters: ScriptExecutionParameters<'sync', A>): Buffer;
             function syncCommandFunction(parameters?: ScriptExecutionParameters<'sync', A>): Buffer {
                 return execSync(compileScript(parameters), { ...parameters?.options, shell: interpreter });
             }
 
             function asyncCommandFunction(callback?: ExecAsyncCallback): ChildProcess;
-            function asyncCommandFunction(parameters?: ScriptExecutionParameters<'async', A>,
-                                          callback?: ExecAsyncCallback): ChildProcess;
+            function asyncCommandFunction(parameters: ScriptExecutionParameters<'async', A>, callback?: ExecAsyncCallback): ChildProcess;
             function asyncCommandFunction(...args: any[]): ChildProcess {
                 if (args.length === 2) {
                     const script = compileScript(args[0]);
@@ -122,21 +153,33 @@ function shell<A extends ShellArguments = {}>(arg1: string | TemplateStringsArra
                 }
             }
 
+            function asyncCommandFunctionWithPromise(): Promise<string | Buffer>;
+            function asyncCommandFunctionWithPromise(parameters: ScriptExecutionParameters<'async', A>): Promise<string | Buffer>;
             function asyncCommandFunctionWithPromise(parameters?: ScriptExecutionParameters<'async', A>): Promise<string | Buffer> {
                 return new Promise((resolve, reject) => {
-                    asyncCommandFunction(parameters, (error, stdout) => {
-                        if (error) {
-                            reject(error);
-                        } else {
-                            resolve(stdout);
-                        }
-                    });
+                    if (parameters) {
+                        asyncCommandFunction(parameters, (error, stdout) => {
+                            if (error) {
+                                reject(error);
+                            } else {
+                                resolve(stdout);
+                            }
+                        });
+                    } else {
+                        asyncCommandFunction((error, stdout) => {
+                            if (error) {
+                                reject(error);
+                            } else {
+                                resolve(stdout);
+                            }
+                        });
+                    }
                 });
             }
 
-            return Object.assign(asyncCommandFunction, {
-                execSync: syncCommandFunction,
-                execAsync: asyncCommandFunction,
+            return Object.assign(asyncCommandFunction as AsynchronousShellCommandFunction<A>, {
+                execSync: syncCommandFunction as SynchronousShellCommandFunction<A>,
+                execAsync: asyncCommandFunction as AsynchronousShellCommandFunction<A>,
                 [promisify.custom]: asyncCommandFunctionWithPromise,
             });
         };
@@ -145,7 +188,7 @@ function shell<A extends ShellArguments = {}>(arg1: string | TemplateStringsArra
 
         return tagFunction;
     } else {
-        return shell(DEFAULT_INTERPRETER)(arg1, ...bindings);
+        return shell<A>(DEFAULT_INTERPRETER)(arg1, ...bindings);
     }
 }
 

@@ -2,25 +2,21 @@
 
 # Intershell
 
-## About
-
-Intershell leverages the power of ES2015 [tagged template literals](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals) to embed and execute Linux shell scripts directly from Node.js applications.
-
-## Usage examples
-
-### Basic usage
-
-The easiest way of including a shell script into your code with Intershell is to write it as a template literal and apply the `shell` tag available from the Intershell package like this:
+Intershell is a utility package that allows for linux shell scripts to be embedded into and executed directly from Javascript/TypeScript code of your Node.js applications by leveraging the power of ES2015 [tagged template literals](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals). Intershell exports a function called `shell` that can serve both as a tag function that turns template string literals into executable script functions; and a factory function for producing specialized tag functions. The example below deminstrates how `shell` can be used as a tag function to wrap a shell script into a function.
 
 <!---example:basic:begin--->
+<!---
+    The code sample below was generated automatically by the primer utility; do not edit.
+    Last update on Sun, 05 Apr 2020 12:52:41 GMT.
+--->
 ```typescript
 // Source code:
 import { shell } from '@atweel/intershell';
 
-const name = 'Robby';
+const name = 'Robby the Robot';
 
 const script = shell`
-    echo "Hello ${ name }!"
+    echo "Hello from ${ name }!"
 `;
 
 script((error, stdout) => {
@@ -32,35 +28,92 @@ script((error, stdout) => {
 });
 
 // Output:
-// Hello Robby!
+// Hello from Robby the Robot!
 ```
 <!---example:basic:end--->
 
-Applying the `shell` tag to a template literal produces a function, invoking which will asynchronously execute the shell script defined by the template literal using the `/bin/sh` interpreter by default. Script function accepts zero to two arguments, the last one being a callback that will be called when the script exits. When invoked, the callback will be passed two arguments: an error (`null` if the script exits with code zero) and a string containing the ouput that the script has produced. The script function returns an instance of [`ChildProcess`](https://nodejs.org/dist/latest-v12.x/docs/api/child_process.html#child_process_class_childprocess) similarly to the `exec` API from the standard Node.js `child_process` package.
+When `shell` is applied to a template literal as in the example above, it produces a function that will start a separate interpreter process to execute the specified script once invoked. By default, intershell uses `/bin/sh` as the interpreter and the script is executed asynchronously, however both [custom interpreters](#Using-a-custom-shell-interpreter) and [synchronous execution]((#synchronous-vs.-asynchronous-execution)) are supported. The function produced by `shell` (aka *intershell script function*) accepts zero to two arguments. These arguments can be a `parameters` object discussed [below](), a callback, both, or none. When a callback is specified, it will be called once the script exits with two arguments: an `error` which can be of any type and an `stdout` (`string` or `Buffer`) containing the output produced by the script. If the script exits with a zero, `error` is null, otherwise `error` contains information about the error.
 
-As with regular template literals, one can use substitutions to shape the scripts produced by Intershell as in the following example. Values of the following types are supported: `boolean`,`string`, `number`, other types need to be converted to string explicitly.
+### Using a custom shell interpreter
 
+As noted previously, when intershell executes scripts, it uses `/bin/sh` as the interpreter by default. Althouth `/bin/sh` seems to be a reasonable choice in most situations, sometimes you might want to specify an interpreter explicitly. For that case, intershell's `shell` function can be invoked as a "regular" (non-tag) function and be provided with a a full path to an interpretere or a command name that can be resolved by the system. The example below demonstrates this. Here, we call `shell` to create a tag function that is bound to the specified interpreter which is `/bin/bash` in this case. Then, we use this tag function in place of `shell` to compile a script function. As seen from the output, the script in this example is actually executed under `/bin/bash` (variable `$0` within a script refers to the executable).
+
+<!---example:custom-interpreter:begin--->
+<!---
+    The code sample below was generated automatically by the primer utility; do not edit.
+    Last update on Sun, 05 Apr 2020 12:52:41 GMT.
+--->
 ```typescript
-import { shell } from 'intershell';
+// Source code:
+import { shell } from '@atweel/intershell';
 
-const name = 'Robby';
+const bashShell = shell('/bin/bash');
 
-const script = shell`echo "Hello from ${ name }!"`;
+const script = bashShell`
+    echo "$0"
+`;
 
 script((error, stdout) => {
-    if (!error) {
-        console.log(stdout);
+    if (error) {
+        console.error(`Intershell script execution failed. ${ error }`);
     } else {
-        console.error(`Error: ${ error }.`);
+        console.log(stdout);
     }
 });
+
+// Output:
+// /bin/bash
 ```
+<!---example:custom-interpreter:end--->
+
+For convenience, intershell package provides shortcuts for the four most used interpreters, namely `/bin/bash`, `/bin/dash`, `/bin/zsh`, and `/bin/sh`.
+
+<!---example:shortcuts:begin--->
+<!---
+    The code sample below was generated automatically by the primer utility; do not edit.
+    Last update on Sun, 05 Apr 2020 12:52:41 GMT.
+--->
+```typescript
+// Source code:
+import { sh, bash, dash, zsh } from '@atweel/intershell';
+
+sh`echo "Hello from $0"`((error, stdout) => {
+    console.log(`${ stdout } (sh)`);
+});
+
+bash`echo "Hello from $0"`((error, stdout) => {
+    console.log(`${ stdout } (bash)`);
+});
+
+dash`echo "Hello from $0"`((error, stdout) => {
+    console.log(`${ stdout } (dash)`);
+});
+
+zsh`echo "Hello from $0"`((error, stdout) => {
+    console.log(`${ stdout } (zsh)`);
+});
+
+// Output:
+// Hello from /bin/dash
+//  (dash)
+// Hello from /bin/bash
+//  (bash)
+// Hello from /bin/sh
+//  (sh)
+// Hello from /bin/zsh
+//  (zsh)
+```
+<!---example:shortcuts:end--->
 
 ### Synchronous vs. asynchronous execution
 
-By default, Intershell scripts are executed asynchronously. To support synchronous execution, Intershell script function exposes a method called `execSync` which would start the interpreter in s separate process, wait for it to finish execution, and return the output as a `Buffer` or a `string` similarly to the `execSync` API from the standard Node.js `child_process` package. 
+As already stated, Intershell scripts are executed asynchronously by default. To support synchronous execution, Intershell script function exposes a method called `execSync` which starts the interpreter in s separate process, waits for it to finish execution, and returns the output as a `Buffer` or a `string` similarly to the `execSync` API from the standard Node.js `child_process` package. 
 
 <!---example:synchronous:begin--->
+<!---
+    The code sample below was generated automatically by the primer utility; do not edit.
+    Last update on Sun, 05 Apr 2020 12:52:41 GMT.
+--->
 ```typescript
 // Source code:
 import { shell } from '@atweel/intershell';
@@ -83,6 +136,10 @@ console.log(output);
 For the sake of API symmetry, Intershell script functions also expose the `execAsync` method which does exactly the same as the direct invocation.
 
 <!---example:asynchronous-explicit:begin--->
+<!---
+    The code sample below was generated automatically by the primer utility; do not edit.
+    Last update on Sun, 05 Apr 2020 12:52:41 GMT.
+--->
 ```typescript
 // Source code:
 import { shell } from '@atweel/intershell';
@@ -110,44 +167,58 @@ script.execAsync((error, stdout) => {
 
 Intershell scripts support promises via the standard `promisify` mechanism from the `util` package for Node.js.
 
+<!---example:promises:begin--->
+<!---
+    The code sample below was generated automatically by the primer utility; do not edit.
+    Last update on Sun, 05 Apr 2020 12:52:41 GMT.
+--->
 ```typescript
+// Source code:
 import { promisify } from 'util';
-import { shell } from 'intershell';
+
+import { shell } from '@atweel/intershell';
 
 const name = 'Robby';
 
 const script = promisify(shell`echo "Hello from ${ name }!"`);
 
-script.then((stdout) => {
+script().then((stdout) => {
     console.log(stdout);
 });
+
+// Output:
+// Hello from Robby!
 ```
+<!---example:promises:end--->
 
-### Custom interpreters
+### Parameterised scripts
 
-By default, intershell scripts are executed under the `/bin/sh` interpreter; however intershell provides support for custom interpreters. A custom interpreter can be passed as an argument to the `shell` function as follows.
+As with regular interpolated template literals, one can use variables that are in the scope of the template to customise the script that is being generated by intershell. But what if we wanted to make a script that is callable with different parameters? To achieve this, one can use the gneric form of the `shell` function as shown below.
 
+<!---example:parameters:begin--->
+<!---
+    The code sample below was generated automatically by the primer utility; do not edit.
+    Last update on Sun, 05 Apr 2020 12:52:41 GMT.
+--->
 ```typescript
-import { shell } from 'intershell';
+// Source code:
+import { shell } from '@atweel/intershell';
 
-const script = shell('/bin/bash')`echo "Hello from $SHELL"`;
+const script = shell<{
+    name: string;
+}>`
+    echo "Hello from ${ ({ name }) => name }!"
+`;
 
-const output = script.execSync();
+console.log(script.execSync({ name: 'Richie' }).toString());
+console.log(script.execSync({ name: 'Megan' }).toString());
 
-console.log(output);
+// Output:
+// Hello from Richie!
+// 
+// Hello from Megan!
 ```
-
-For convenience, intershell provides build-in shortcuts for the three most supported interpreters: `sh`, `bash`, `zsh`. Please note, that `sh` is an alias for `shell` as `shell` uses `/bin/sh` by default.
-
-```typescript
-import { sh, bash, zsh } from 'intershell';
-
-console.log(sh`echo "Hello from $SHELL"`.execSync().toString());
-
-console.log(bash`echo "Hello from $SHELL"`.execSync().toString());
-
-console.log(zsh`echo "Hello from $SHELL"`.execSync().toString());
-```
+<!---example:parameters:end--->
 
 ## Dependencies
 
