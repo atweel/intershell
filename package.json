@@ -26,8 +26,10 @@
     "showcase"
   ],
   "devDependencies": {
+    "@types/command-exists": "^1.2.0",
     "@typescript-eslint/eslint-plugin": "^2.25.0",
     "@typescript-eslint/parser": "^2.25.0",
+    "command-exists": "^1.2.8",
     "eslint": "^6.8.0",
     "eslint-plugin-react": "^7.19.0",
     "husky": "^4.2.3",

@@ -1,4 +1,5 @@
 import 'reflect-metadata';
+import commandExists from 'command-exists';
 
 import * as shells from 'intershell';
 
@@ -11,30 +12,33 @@ const shortcuts = Object.entries(shells)
         metadata: Reflect.getMetadata(shells.TAG_FUNCTION_METADATA_KEY, value),
     }));
 
-
 for (const shortcut of shortcuts) {
-    describe(`'${ shortcut.name }' template literal tag...`, function () {
-        describe(`...invoked without parameters...`, function () {
-            it(`...executes the given script using /bin/${ shortcut.name } interpreter...`, function () {
-                if (typeof shortcut.tag !== 'function') {
-                    throw new Error(`Expected a template tag function, but ${ shortcut.tag } is (a/an) ${ typeof shortcut.tag }`);
-                }
+    if (commandExists.sync(shortcut.name)) {
+        describe(`'${ shortcut.name }' template literal tag...`, function () {
+            describe(`...invoked without parameters...`, function () {
+                it(`...executes the given script using /bin/${ shortcut.name } interpreter...`, function () {
+                    if (typeof shortcut.tag !== 'function') {
+                        throw new Error(`Expected a template tag function, but ${ shortcut.tag } is (a/an) ${ typeof shortcut.tag }`);
+                    }
 
-                const script = shortcut.tag`echo SHELL = $0`;
+                    const script = shortcut.tag`echo SHELL = $0`;
 
-                return new Promise((resolve, reject) => {
-                    script({}, (error, stdout) => {
-                        if (error) {
-                            reject(error);
-                        }
+                    return new Promise((resolve, reject) => {
+                        script({}, (error, stdout) => {
+                            if (error) {
+                                reject(error);
+                            }
 
-                        expect(stdout.toString()).toMatch(new RegExp(`SHELL = ${ shortcut.metadata.interpreter }`));
+                            expect(stdout.toString()).toMatch(new RegExp(`SHELL = ${ shortcut.metadata.interpreter }`));
 
-                        resolve();
+                            resolve();
+                        });
                     });
                 });
             });
         });
-    });
+    } else {
+        console.log(`Command '${ shortcut.name }' is not available on this system and will not be tested.`);
+    }
 }
 
