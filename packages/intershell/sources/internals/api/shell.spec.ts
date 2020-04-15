@@ -166,4 +166,24 @@ describe('shell function', () => {
                                                   expect.anything());
         });
     });
+
+    it(`correctly formats parameters passed using selector ('array') notation`, () => {
+        const script = shell<{
+            booleanTrueFlag: boolean;
+            booleanFalseFlag: boolean;
+            numericParameter: number;
+            stringParameter: string;
+        }>`command ${ [ 'booleanTrueFlag', 'booleanFalseFlag', 'numericParameter', 'stringParameter' ] }`;
+
+        const output = script.execSync({
+            booleanTrueFlag: true,
+            booleanFalseFlag: false,
+            numericParameter: 100,
+            stringParameter: 'some string',
+        }).toString();
+
+        expect(output).toEqual('mock output');
+        expect(execSync)
+            .toHaveBeenLastCalledWith(`command --boolean-true-flag --numeric-parameter 100 --string-parameter "some string"`, { 'shell': '/bin/sh' });
+    });
 });

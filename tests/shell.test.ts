@@ -163,9 +163,9 @@ describe(`'${ shell.name }' template literal tag...`, function () {
 
             const argumentValues = {
                 numeric: 1000,
-                word: 'single-word',
-                sentence: 'multiple words',
-                quoted: 'multiple "quoted" words',
+                word: `single-word`,
+                sentence: `multiple words`,
+                quoted: `multiple \\"quoted\\" words`,
             };
 
             return new Promise((resolve, reject) => {
@@ -184,9 +184,9 @@ describe(`'${ shell.name }' template literal tag...`, function () {
                     const output = stdout.toString();
 
                     expect(output).toContain(argumentValues.numeric.toString());
-                    expect(output).toContain(argumentValues.word);
-                    expect(output).toContain(argumentValues.sentence);
-                    expect(output).toContain(argumentValues.quoted);
+                    expect(output).toContain(`single-word`);
+                    expect(output).toContain(`multiple words`);
+                    expect(output).toContain(`multiple "quoted" words`);
 
                     resolve();
                 });

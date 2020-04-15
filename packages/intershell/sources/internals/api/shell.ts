@@ -2,9 +2,6 @@
 import {
     exec,
     execSync,
-    ExecOptions,
-    ExecSyncOptions,
-    ExecException,
     ChildProcess,
 } from 'child_process';
 import 'reflect-metadata';
@@ -13,29 +10,23 @@ import { promisify, CustomPromisifySymbol } from 'util';
 
 const debug = debugFactory('intershell');
 
-import { DEFAULT_INTERPRETER, SUPPORTED_INTERPRETERS, TAG_FUNCTION_METADATA_KEY } from '../../constants';
+import {
+    DEFAULT_INTERPRETER,
+    SUPPORTED_INTERPRETERS,
+    TAG_FUNCTION_METADATA_KEY,
+} from '../../constants';
 
-type ShellInvocationMode = 'sync' | 'async';
+import {
+    ShellInvocationMode,
+    ExecAsyncCallback,
+    ShellArgument,
+    ShellArguments,
+    ShellArgumentSelectorExpression,
+    ShellArgumentBinding,
+    ScriptExecutionParameters,
+} from 'primitives';
 
-type ShellExecOptions<M extends ShellInvocationMode> = Omit<M extends 'sync' ? ExecSyncOptions : ExecOptions, 'shell'>;
-
-type ExecAsyncCallback = (error: ExecException | null, stdout: string | Buffer, stderr: string | Buffer) => void;
-
-type ShellArgument = number | string | boolean | undefined | null;
-
-interface ShellArguments {
-    [key: string]: ShellArgument;
-}
-
-type ShellArgumentSelectorExpression<A> = (a: A | undefined) => ShellArgument;
-type ShellArgumentIndexerExpression<A> = [keyof A];
-type ShellArgumentExpression<A> = ShellArgumentSelectorExpression<A> | ShellArgumentIndexerExpression<A>;
-
-type ShellArgumentBinding<A> = ShellArgument | ShellArgumentExpression<A>;
-
-type ScriptExecutionParameters<M extends ShellInvocationMode, A extends ShellArguments> = A & {
-    options?: ShellExecOptions<M>;
-}
+import { projectShellArguments } from 'utils';
 
 type PromisifySymbol<A extends ShellArguments> = Partial<A> extends A
     ? CustomPromisifySymbol<{
@@ -65,6 +56,7 @@ type SynchronousShellCommandFunction<A extends ShellArguments> = Partial<A> exte
 type ShellCommandFunction<A extends ShellArguments> = AsynchronousShellCommandFunction<A> & {
     execSync: SynchronousShellCommandFunction<A>;
     execAsync: AsynchronousShellCommandFunction<A>;
+    compile: (parameters?: A) => string;
 }
 
 // interface ShellCommandFunction<A extends ShellArguments> extends CustomPromisifySymbol<ShellCommandFunctionWithPromise<A>> {
@@ -100,19 +92,11 @@ function shell<A extends ShellArguments = {}>(arg1: string | TemplateStringsArra
                 .map((binding) => typeof binding === 'function'
                     ? binding
                     : Array.isArray(binding)
-                        ? (args: A | undefined): ShellArgument => args?.[binding[0]]
+                        ? (args: Partial<A> = {}): ShellArgument => projectShellArguments(args, binding)
                         : (): ShellArgument => binding);
 
-            const compileScript = (parameters?: ScriptExecutionParameters<'sync', A>): string => {
-                const resolveArgument = (index: number): string => {
-                    let value = '' + (expressions[index]?.(parameters) || '');
-
-                    if (value.includes('"')) {
-                        value = value.replace(/"/g, '\\"');
-                    }
-
-                    return value.includes(' ') ? `"${ value }"` : value;
-                };
+            const compileScript = (parameters?: A): string => {
+                const resolveArgument = (index: number): string => '' + (expressions[index]?.(parameters) || '');
 
                 return scriptParts
                     .map((str, index) => str + resolveArgument(index))
@@ -180,6 +164,7 @@ function shell<A extends ShellArguments = {}>(arg1: string | TemplateStringsArra
             return Object.assign(asyncCommandFunction as AsynchronousShellCommandFunction<A>, {
                 execSync: syncCommandFunction as SynchronousShellCommandFunction<A>,
                 execAsync: asyncCommandFunction as AsynchronousShellCommandFunction<A>,
+                compile: compileScript,
                 [promisify.custom]: asyncCommandFunctionWithPromise,
             });
         };

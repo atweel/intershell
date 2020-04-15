@@ -30,7 +30,7 @@ module.exports = {
       "FunctionExpression": {"parameters": "first"},
       "CallExpression": {"arguments": "first"},
       "MemberExpression": 1,
-      "flatTernaryExpressions": true,
+      //"flatTernaryExpressions": false,
       "SwitchCase": 1
     }],
     "no-trailing-spaces": "error",
