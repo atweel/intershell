@@ -9,30 +9,30 @@ Intershell is a utility package that allows developers to write and execute linu
 ### Repository structure and tools
 
 This repostitory is structured as a `lerna` monorepo that contains two packages. The `package` directory contains source code of the Intershell package itself, while the `primer` directory contains an auxillary `intershell-primer` package that is used to showcase the features of Intershell and generating code samples for documentation. For the purpose of development and testing, the following tools and packages are included as development dependencies:
-- `yarn` is the package manager we use,
-- `command-exists` is used in the `intershell-primer` package to find out which interpreters are available on the system,
-- `eslint` with `@typescript-eslint/parser` and `@typescript-eslint/eslint-plugin` is the linting tool of our choice,
-- `husky` is used to configure and run git hooks, specifically the `pre-commit` hook that is used for building and testing packages prior to commit,
-- `jest` with `ts-jest` preset is our tool for unit and integration testing,
-- `lerna`, as mentioned, is used to organize the repository,
-- `ts-node` is used to run primer without preeliminary transpilation,
-- `typescript` is the standard compiler for TypeScript, and finally
-- `ttypescript` is a wrapper on top of `typescript` that adds support for applying code transformations during transpilation process.
+- [`yarn`](https://www.npmjs.com/packages/yarn) is the package manager we use,
+- [`command-exists`](https://www.npmjs.com/packages/command-exists) is used in the `intershell-primer` package to find out which interpreters are available on the system,
+- [`eslint`](https://www.npmjs.com/packages/eslint) with [`@typescript-eslint/parser`](https://www.npmjs.com/packages/@typescript-eslint/parser) and [`@typescript-eslint/eslint-plugin`](https://www.npmjs.com/packages/@typescript-eslint/eslint-plugin) is the linting tool of our choice,
+- [`husky`](https://www.npmjs.com/packages/husky) is used to configure and run git hooks, specifically the `pre-commit` hook that is used for building and testing packages prior to commit,
+- [`jest`](https://www.npmjs.com/packages/jest) with [`ts-jest`](https://www.npmjs.com/packages/ts-jest) preset is our tool for unit and integration testing,
+- [`lerna`](https://www.npmjs.com/packages/lerna), as mentioned, is used to organize the repository,
+- [`ts-node` ](https://www.npmjs.com/packages/ts-node)is used to run primer without preeliminary transpilation,
+- [`typescript`](https://www.npmjs.com/packages/typescript) is the standard compiler for TypeScript, and finally
+- [`ttypescript`](https://www.npmjs.com/packages/ttypescript) is a wrapper on top of [`typescript`](https://www.npmjs.com/packages/typescript) that adds support for applying code transformations during transpilation process.
 
 In this repository, we aim to automate as many routine operations as possible.
 
 ### Preferred IDE
 
-We prefer VS Code with `devcontainer` support as out IDE which allows us to maintan a standard configuraton of the development environent and sharing as part of the repository. The `devcontainer` includes all non-npm dependencies that we have found useful during development process.
+We prefer [VS Code](https://code.visualstudio.com/) with [`devcontainer`](https://code.visualstudio.com/docs/remote/containers) support as out IDE which allows us to maintan a standard configuraton of the development environent and sharing as part of the repository. The [`devcontainer`](https://code.visualstudio.com/docs/remote/containers) includes all non-npm dependencies that we have found useful during development process.
 
 ### Getting started with the repository
 
 After you've cloned the repository, you will nened to run `lerna bootstrap` command to install dependencies and cross-link repository packages. 
-If you're developing with VS Code against a `devcontainer`, `lerna` is available insdide the cotnainer out of the box. Otherwise, you need to have `lerna` installed globally on your development machine.
+If you're developing with VS Code against a [`devcontainer`](https://code.visualstudio.com/docs/remote/containers), `lerna` is available insdide the cotnainer out of the box. Otherwise, you need to have `lerna` installed globally on your development machine.
 
 ### Building the packages
 
-To build packages, run `yarn build`. This script builds the `intershell` package using the `ttypescript` compiler. Please note that `intershell-primer` is not required to be built as it is supposed to be run via `ts-node`. If you want to have a clean build, run `yarn rebuild` instead. This script cleans all package outouts as well as other generated files such as coverage reports.
+To build packages, run `yarn build`. This script builds the `intershell` package using the `ttypescript` compiler. Please note that `intershell-primer` is not required to be built as it is supposed to be run via [`ts-node`](https://www.npmjs.com/package/ts-node). If you want to have a clean build, run `yarn rebuild` instead. This script cleans all package outouts as well as other generated files such as coverage reports.
 
 ### Testing your code
 
@@ -50,7 +50,7 @@ Contributions in the form of issues and PRs are always welcome. For additional i
 
 ## Dependencies
 
-As of version `1.0.0.beta-4`, `intershell` has three runtime dependencies: [`debug`](https://www.npmjs.com/package/debug), [`param-case`](https://www.npmjs.com/package/param-case), and [`reflect-metadata`](https://www.npmjs.com/package/reflect-metadata). Please note that at the time of writing, the `reflect-metadata` API is not yet standardized and may change in the future which might require potentially breaking changes in i`ntershell`.
+As of version [`1.0.0.beta-6`](https://www.npmjs.com/package/@atweel/intershell/v/1.0.0-beta.6), `intershell` has three runtime dependencies: [`debug`](https://www.npmjs.com/package/debug), [`param-case`](https://www.npmjs.com/package/param-case), and [`reflect-metadata`](https://www.npmjs.com/package/reflect-metadata). Please note that at the time of writing, the `reflect-metadata` API is not yet standardized and may change in the future which might require potentially breaking changes in `intershell`.
 
 ## License
 
