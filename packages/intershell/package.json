@@ -1,6 +1,6 @@
 {
   "name": "@atweel/intershell",
-  "version": "1.0.0-beta.4",
+  "version": "1.0.0-beta.5",
   "description": "A package that allows for describing linux shell scripts inside Javascript/TypeScript code and invoking them drirectly from Node.js applications.",
   "author": "Eduard Malakhov <eduard@atweel.com>",
   "homepage": "https://github.com/atweel/intershell#readme",
