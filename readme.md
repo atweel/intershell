@@ -11,7 +11,7 @@ Intershell is a utility package that allows developers to write and execute linu
 This repostitory is structured as a `lerna` monorepo that contains two packages. The `package` directory contains source code of the Intershell package itself, while the `primer` directory contains an auxillary `intershell-primer` package that is used to showcase the features of Intershell and generating code samples for documentation. For the purpose of development and testing, the following tools and packages are included as development dependencies:
 - `yarn` is the package manager we use,
 - `command-exists` is used in the `intershell-primer` package to find out which interpreters are available on the system,
-- `eslint` with `@typescript-eslint/parser` and `@typescript-eslint/eslint-plugin` is the lining tool of our choice,
+- `eslint` with `@typescript-eslint/parser` and `@typescript-eslint/eslint-plugin` is the linting tool of our choice,
 - `husky` is used to configure and run git hooks, specifically the `pre-commit` hook that is used for building and testing packages prior to commit,
 - `jest` with `ts-jest` preset is our tool for unit and integration testing,
 - `lerna`, as mentioned, is used to organize the repository,
@@ -28,7 +28,7 @@ We prefer VS Code with `devcontainer` support as out IDE which allows us to main
 ### Getting started with the repository
 
 After you've cloned the repository, you will nened to run `lerna bootstrap` command to install dependencies and cross-link repository packages. 
-If you're developing with VS Code against a `devcontainer`, `lerna` is available out of the box. Otherwise, you need to have `lerna` installed globally on your development machine.
+If you're developing with VS Code against a `devcontainer`, `lerna` is available insdide the cotnainer out of the box. Otherwise, you need to have `lerna` installed globally on your development machine.
 
 ### Building the packages
 
