@@ -2,254 +2,55 @@
 
 # Intershell
 
-Intershell is a utility package that allows for linux shell scripts to be embedded into and executed directly from Javascript/TypeScript code of your Node.js applications by leveraging the power of ES2015 [tagged template literals](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals). Intershell exports a function called `shell` that can serve both as a tag function that turns template string literals into executable script functions; and a factory function for producing specialized tag functions. The example below deminstrates how `shell` can be used as a tag function to wrap a shell script into a function.
-
-<!---example:basic:begin--->
-<!---
-    The code sample below was generated automatically by the primer utility; do not edit.
-    Last update on Thu, 16 Apr 2020 03:25:02 GMT.
---->
-```typescript
-// Source code:
-import { shell } from '@atweel/intershell';
-
-const name = 'Robby the Robot';
-
-const script = shell`
-    echo "Hello from ${ name }!"
-`;
-
-script((error, stdout) => {
-    if (error) {
-        console.error(`Intershell script execution failed. ${ error }`);
-    } else {
-        console.log(stdout);
-    }
-});
-
-// Output:
-// Hello from Robby the Robot!
-```
-<!---example:basic:end--->
-
-When `shell` is applied to a template literal as in the example above, it produces a function that will start a separate interpreter process to execute the specified script once invoked. By default, intershell uses `/bin/sh` as the interpreter and the script is executed asynchronously, however both [custom interpreters](#Using-a-custom-shell-interpreter) and [synchronous execution]((#synchronous-vs.-asynchronous-execution)) are supported. The function produced by `shell` (aka *intershell script function*) accepts zero to two arguments. These arguments can be a `parameters` object discussed [below](), a callback, both, or none. When a callback is specified, it will be called once the script exits with two arguments: an `error` which can be of any type and an `stdout` (`string` or `Buffer`) containing the output produced by the script. If the script exits with a zero, `error` is null, otherwise `error` contains information about the error.
-
-### Using a custom shell interpreter
-
-As noted previously, when intershell executes scripts, it uses `/bin/sh` as the interpreter by default. Althouth `/bin/sh` seems to be a reasonable choice in most situations, sometimes you might want to specify an interpreter explicitly. For that case, intershell's `shell` function can be invoked as a "regular" (non-tag) function and be provided with a a full path to an interpretere or a command name that can be resolved by the system. The example below demonstrates this. Here, we call `shell` to create a tag function that is bound to the specified interpreter which is `/bin/bash` in this case. Then, we use this tag function in place of `shell` to compile a script function. As seen from the output, the script in this example is actually executed under `/bin/bash` (variable `$0` within a script refers to the executable).
-
-<!---example:custom-interpreter:begin--->
-<!---
-    The code sample below was generated automatically by the primer utility; do not edit.
-    Last update on Thu, 16 Apr 2020 03:25:02 GMT.
---->
-```typescript
-// Source code:
-import { shell } from '@atweel/intershell';
-
-const bashShell = shell('/bin/bash');
-
-const script = bashShell`
-    echo "$0"
-`;
-
-script((error, stdout) => {
-    if (error) {
-        console.error(`Intershell script execution failed. ${ error }`);
-    } else {
-        console.log(stdout);
-    }
-});
-
-// Output:
-// /bin/bash
-```
-<!---example:custom-interpreter:end--->
-
-For convenience, intershell package provides shortcuts for the four most used interpreters, namely `/bin/bash`, `/bin/dash`, `/bin/zsh`, and `/bin/sh`.
-
-<!---example:shortcuts:begin--->
-<!---
-    The code sample below was generated automatically by the primer utility; do not edit.
-    Last update on Thu, 16 Apr 2020 03:25:02 GMT.
---->
-```typescript
-// Source code:
-import commandExists from 'command-exists';
-import { sh, bash, dash, zsh } from '@atweel/intershell';
-
-commandExists('sh')
-    .then(() => {
-        sh`echo "Hello from $0"`((error, stdout) => {
-            console.log(`${ stdout } (sh)`);
-        });
-    }).catch(() => {
-        console.log(`Command 'sh' is not available on this system.`);
-    });
-
-commandExists('bash')
-    .then(() => {
-        bash`echo "Hello from $0"`((error, stdout) => {
-            console.log(`${ stdout } (bash)`);
-        });
-    }).catch(() => {
-        console.log(`Command 'bash' is not available on this system.`);
-    });
-
-commandExists('dash')
-    .then(() => {
-        dash`echo "Hello from $0"`((error, stdout) => {
-            console.log(`${ stdout } (dash)`);
-        });
-    }).catch(() => {
-        console.log(`Command 'dash' is not available on this system.`);
-    });
-
-commandExists('zsh')
-    .then(() => {
-        zsh`echo "Hello from $0"`((error, stdout) => {
-            console.log(`${ stdout } (zsh)`);
-        });
-    }).catch(() => {
-        console.log(`Command 'zsh' is not available on this system.`);
-    });
-
-
-// Output:
-// Hello from /bin/dash
-//  (dash)
-// Hello from /bin/zsh
-//  (zsh)
-// Hello from /bin/sh
-//  (sh)
-// Hello from /bin/bash
-//  (bash)
-```
-<!---example:shortcuts:end--->
-
-### Synchronous vs. asynchronous execution
-
-As already stated, Intershell scripts are executed asynchronously by default. To support synchronous execution, Intershell script function exposes a method called `execSync` which starts the interpreter in s separate process, waits for it to finish execution, and returns the output as a `Buffer` or a `string` similarly to the `execSync` API from the standard Node.js `child_process` package. 
-
-<!---example:synchronous:begin--->
-<!---
-    The code sample below was generated automatically by the primer utility; do not edit.
-    Last update on Thu, 16 Apr 2020 03:25:02 GMT.
---->
-```typescript
-// Source code:
-import { shell } from '@atweel/intershell';
-
-const name = 'Robby';
-
-const script = shell`
-    echo "Hello ${ name }!"
-`;
-
-const output = script.execSync().toString();
-
-console.log(output);
-
-// Output:
-// Hello Robby!
-```
-<!---example:synchronous:end--->
-
-For the sake of API symmetry, Intershell script functions also expose the `execAsync` method which does exactly the same as the direct invocation.
-
-<!---example:asynchronous-explicit:begin--->
-<!---
-    The code sample below was generated automatically by the primer utility; do not edit.
-    Last update on Thu, 16 Apr 2020 03:25:02 GMT.
---->
-```typescript
-// Source code:
-import { shell } from '@atweel/intershell';
-
-const name = 'Robby';
-
-const script = shell`
-    echo "Hello ${ name }!"
-`;
-
-script.execAsync((error, stdout) => {
-    if (error) {
-        console.error(`Intershell script execution failed. ${ error }`);
-    } else {
-        console.log(stdout);
-    }
-});
-
-// Output:
-// Hello Robby!
-```
-<!---example:asynchronous-explicit:end--->
-
-### Support for promises
-
-Intershell scripts support promises via the standard `promisify` mechanism from the `util` package for Node.js.
-
-<!---example:promises:begin--->
-<!---
-    The code sample below was generated automatically by the primer utility; do not edit.
-    Last update on Thu, 16 Apr 2020 03:25:02 GMT.
---->
-```typescript
-// Source code:
-import { promisify } from 'util';
-
-import { shell } from '@atweel/intershell';
-
-const name = 'Robby';
-
-const script = promisify(shell`echo "Hello from ${ name }!"`);
-
-script().then((stdout) => {
-    console.log(stdout);
-});
-
-// Output:
-// Hello from Robby!
-```
-<!---example:promises:end--->
-
-### Parameterised scripts
-
-As with regular interpolated template literals, one can use variables that are in the scope of the template to customise the script that is being generated by intershell. But what if we wanted to make a script that is callable with different parameters? To achieve this, one can use the gneric form of the `shell` function as shown below.
-
-<!---example:parameters:begin--->
-<!---
-    The code sample below was generated automatically by the primer utility; do not edit.
-    Last update on Thu, 16 Apr 2020 03:25:02 GMT.
---->
-```typescript
-// Source code:
-import { shell } from '@atweel/intershell';
-
-const script = shell<{
-    name: string;
-}>`
-    echo "Hello from ${ ({ name }) => name }!"
-`;
-
-console.log(script.execSync({ name: 'Richie' }).toString());
-console.log(script.execSync({ name: 'Megan' }).toString());
-
-// Output:
-// Hello from Richie!
-// 
-// Hello from Megan!
-```
-<!---example:parameters:end--->
-
-## Dependencies
-
-As of version 1.0.0, intershell has only two runtime dependencies: [`debug`](https://www.npmjs.com/package/debug) and 
-[`reflect-metadata`](https://www.npmjs.com/package/reflect-metadata). Please note, that `reflect-metadata` API is not yet standardized and may change in the future.
+Intershell is a utility package that allows developers to write and execute linux shell scripts as part of their Javascript/TypeScript applications for Node.js by leveraging the power of ES2015 [tagged template literals](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals). Intershell's `shell` function provides a simple interface that allows for executing template-literal-formatted scripts using the default or a custom interpreter both in synchronous and asynchronous mode, configuring parameters of the interpreter process, as well as compiling a script into a string that can be executed manually. For detailed guidelines and examples of using Intershell, please refer to the [package's readme](package/readme.md).
 
 ## Contributing
 
+### Repository structure and tools
+
+This repostitory is structured as a `lerna` monorepo that contains two packages. The `package` directory contains source code of the Intershell package itself, while the `primer` directory contains an auxillary `intershell-primer` package that is used to showcase the features of Intershell and generating code samples for documentation. For the purpose of development and testing, the following tools and packages are included as development dependencies:
+- `yarn` is the package manager we use,
+- `command-exists` is used in the `intershell-primer` package to find out which interpreters are available on the system,
+- `eslint` with `@typescript-eslint/parser` and `@typescript-eslint/eslint-plugin` is the lining tool of our choice,
+- `husky` is used to configure and run git hooks, specifically the `pre-commit` hook that is used for building and testing packages prior to commit,
+- `jest` with `ts-jest` preset is our tool for unit and integration testing,
+- `lerna`, as mentioned, is used to organize the repository,
+- `ts-node` is used to run primer without preeliminary transpilation,
+- `typescript` is the standard compiler for TypeScript, and finally
+- `ttypescript` is a wrapper on top of `typescript` that adds support for applying code transformations during transpilation process.
+
+In this repository, we aim to automate as many routine operations as possible.
+
+### Preferred IDE
+
+We prefer VS Code with `devcontainer` support as out IDE which allows us to maintan a standard configuraton of the development environent and sharing as part of the repository. The `devcontainer` includes all non-npm dependencies that we have found useful during development process.
+
+### Getting started with the repository
+
+After you've cloned the repository, you will nened to run `lerna bootstrap` command to install dependencies and cross-link repository packages. 
+If you're developing with VS Code against a `devcontainer`, `lerna` is available out of the box. Otherwise, you need to have `lerna` installed globally on your development machine.
+
+### Building the packages
+
+To build packages, run `yarn build`. This script builds the `intershell` package using the `ttypescript` compiler. Please note that `intershell-primer` is not required to be built as it is supposed to be run via `ts-node`. If you want to have a clean build, run `yarn rebuild` instead. This script cleans all package outouts as well as other generated files such as coverage reports.
+
+### Testing your code
+
+Intershell includes unit and integration tests. Unit tests are located in the sources directory of the `intershell` package and are named after respective code files with an additiopn of `spec` before extension, e.g. `shell.spec.ts`. Unit tests ensure that the package's API is working as expected in clean conditions with most dependecies replacesd by mocks.
+
+Integration tests are maintained outside the package code and are located in the tests directory at repository root. Unlike unit tests that import specific modules from the package under test, these tests import the package as a whole emulating the way a dependent pakcage would use `intershell`. Thus, integration tests test the pakcage's API as seen by client code. Integration tests do not mock any dependencies and therefore start real interpreter processes to run `intershell` scripts. This limits the number of interpreters that can be tested on a particular machine to those interpreters that are available there. If an interpreter is not available, the respective test will be skipped.
+
+Both unit and integration tests are run as part of the `integration` script that is used to validate commits and builds. A minimum coverage of 85% for each of branches, functions, lines, and statements is formally required by jest configuration. However, as the package is relatively tiny, we aim at maintaining code coverage close to 100% (not less than 95.56% at the time of writing). If you're adding new code, please make sure to add tests to cover it. If you're uggesting a change to existing behavior, please change related tests accordingly.
+
+### Integration
+
+We use the term 'integration' to refer to the entire process of building and testing the code. Integration script is run as part of the a pre-commit hook, as well as during server-side builds. As the final stage, integration script uses primer to update the package's readme with fresh code samples. Integration does not include building and publishing the package itself. These operations are executed separately on the build servers.
+
 Contributions in the form of issues and PRs are always welcome. For additional information on the topic, please refer to [contributing.md](contributing.md).
+
+## Dependencies
+
+As of version `1.0.0.beta-4`, `intershell` has three runtime dependencies: [`debug`](https://www.npmjs.com/package/debug), [`param-case`](https://www.npmjs.com/package/param-case), and [`reflect-metadata`](https://www.npmjs.com/package/reflect-metadata). Please note that at the time of writing, the `reflect-metadata` API is not yet standardized and may change in the future which might require potentially breaking changes in i`ntershell`.
 
 ## License
 
