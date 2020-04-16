@@ -66,3 +66,7 @@ jobs:
         if: github.event_name == 'push'
         run: git push --tags && git push
 
+      - name: Upload test code coverage reports
+        if: github.event_name == 'push'
+        run: bash <(curl -s https://codecov.io/bash)
+
