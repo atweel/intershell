@@ -1,5 +1,3 @@
-![Validation on master](https://github.com/atweel/intershell/workflows/Integrate%20master%20branch/badge.svg?branch=master&event=push)
-
 # Intershell
 
 Intershell is a utility package that allows for linux shell scripts to be embedded into and executed directly from Javascript/TypeScript code of your Node.js applications by leveraging the power of ES2015 [tagged template literals](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals). Intershell exports a function called `shell` that can serve both as a tag function that turns template string literals into executable script functions; and a factory function for producing specialized tag functions. The example below deminstrates how `shell` can be used as a tag function to wrap a shell script into a function.
@@ -7,7 +5,7 @@ Intershell is a utility package that allows for linux shell scripts to be embedd
 <!---example:basic:begin--->
 <!---
     The code sample below was generated automatically by the primer utility; do not edit.
-    Last update on Thu, 16 Apr 2020 01:45:56 GMT.
+    Last update on Sun, 05 Apr 2020 12:52:41 GMT.
 --->
 ```typescript
 // Source code:
@@ -41,7 +39,7 @@ As noted previously, when intershell executes scripts, it uses `/bin/sh` as the 
 <!---example:custom-interpreter:begin--->
 <!---
     The code sample below was generated automatically by the primer utility; do not edit.
-    Last update on Thu, 16 Apr 2020 01:45:56 GMT.
+    Last update on Sun, 05 Apr 2020 12:52:41 GMT.
 --->
 ```typescript
 // Source code:
@@ -71,59 +69,37 @@ For convenience, intershell package provides shortcuts for the four most used in
 <!---example:shortcuts:begin--->
 <!---
     The code sample below was generated automatically by the primer utility; do not edit.
-    Last update on Thu, 16 Apr 2020 01:45:56 GMT.
+    Last update on Sun, 05 Apr 2020 12:52:41 GMT.
 --->
 ```typescript
 // Source code:
-import commandExists from 'command-exists';
 import { sh, bash, dash, zsh } from '@atweel/intershell';
 
-commandExists('sh')
-    .then(() => {
-        sh`echo "Hello from $0"`((error, stdout) => {
-            console.log(`${ stdout } (sh)`);
-        });
-    }).catch(() => {
-        console.log(`Command 'sh' is not available on this system.`);
-    });
+sh`echo "Hello from $0"`((error, stdout) => {
+    console.log(`${ stdout } (sh)`);
+});
 
-commandExists('bash')
-    .then(() => {
-        bash`echo "Hello from $0"`((error, stdout) => {
-            console.log(`${ stdout } (bash)`);
-        });
-    }).catch(() => {
-        console.log(`Command 'bash' is not available on this system.`);
-    });
+bash`echo "Hello from $0"`((error, stdout) => {
+    console.log(`${ stdout } (bash)`);
+});
 
-commandExists('dash')
-    .then(() => {
-        dash`echo "Hello from $0"`((error, stdout) => {
-            console.log(`${ stdout } (dash)`);
-        });
-    }).catch(() => {
-        console.log(`Command 'dash' is not available on this system.`);
-    });
+dash`echo "Hello from $0"`((error, stdout) => {
+    console.log(`${ stdout } (dash)`);
+});
 
-commandExists('zsh')
-    .then(() => {
-        zsh`echo "Hello from $0"`((error, stdout) => {
-            console.log(`${ stdout } (zsh)`);
-        });
-    }).catch(() => {
-        console.log(`Command 'zsh' is not available on this system.`);
-    });
-
+zsh`echo "Hello from $0"`((error, stdout) => {
+    console.log(`${ stdout } (zsh)`);
+});
 
 // Output:
 // Hello from /bin/dash
 //  (dash)
-// Hello from /bin/zsh
-//  (zsh)
-// Hello from /bin/sh
-//  (sh)
 // Hello from /bin/bash
 //  (bash)
+// Hello from /bin/sh
+//  (sh)
+// Hello from /bin/zsh
+//  (zsh)
 ```
 <!---example:shortcuts:end--->
 
@@ -134,7 +110,7 @@ As already stated, Intershell scripts are executed asynchronously by default. To
 <!---example:synchronous:begin--->
 <!---
     The code sample below was generated automatically by the primer utility; do not edit.
-    Last update on Thu, 16 Apr 2020 01:45:56 GMT.
+    Last update on Sun, 05 Apr 2020 12:52:41 GMT.
 --->
 ```typescript
 // Source code:
@@ -160,7 +136,7 @@ For the sake of API symmetry, Intershell script functions also expose the `execA
 <!---example:asynchronous-explicit:begin--->
 <!---
     The code sample below was generated automatically by the primer utility; do not edit.
-    Last update on Thu, 16 Apr 2020 01:45:56 GMT.
+    Last update on Sun, 05 Apr 2020 12:52:41 GMT.
 --->
 ```typescript
 // Source code:
@@ -192,7 +168,7 @@ Intershell scripts support promises via the standard `promisify` mechanism from 
 <!---example:promises:begin--->
 <!---
     The code sample below was generated automatically by the primer utility; do not edit.
-    Last update on Thu, 16 Apr 2020 01:45:56 GMT.
+    Last update on Sun, 05 Apr 2020 12:52:41 GMT.
 --->
 ```typescript
 // Source code:
@@ -220,7 +196,7 @@ As with regular interpolated template literals, one can use variables that are i
 <!---example:parameters:begin--->
 <!---
     The code sample below was generated automatically by the primer utility; do not edit.
-    Last update on Thu, 16 Apr 2020 01:45:56 GMT.
+    Last update on Sun, 05 Apr 2020 12:52:41 GMT.
 --->
 ```typescript
 // Source code:

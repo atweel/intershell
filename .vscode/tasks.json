@@ -9,6 +9,22 @@
             "script": "build",
             "group": "build",
             "problemMatcher": []
+        },
+        {
+            "type": "npm",
+            "script": "test:unit",
+            "group": "test",
+            "problemMatcher": [],
+            "label": "Run unit tests",
+            "detail": "yarn test:unit"
+        },
+        {
+            "type": "npm",
+            "script": "test",
+            "group": "test",
+            "problemMatcher": [],
+            "label": "Run all tests",
+            "detail": "yarn test"
         }
     ]
 }

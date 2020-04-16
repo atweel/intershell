@@ -1,5 +1,7 @@
 import 'jest';
 
+let execShouldFail = false;
+
 import { execSync, exec, ChildProcess, ExecSyncOptions, ExecOptions } from 'child_process';
 import { promisify } from 'util';
 
@@ -12,8 +14,14 @@ jest.mock('child_process', () => ({
     exec: jest.fn((...args: any[]) => {
         const callback = args.length > 0 && args[args.length - 1];
 
-        if (typeof callback === 'function') {
-            setImmediate(() => callback(null, 'mock output'));
+        if (!execShouldFail) {
+            if (typeof callback === 'function') {
+                setImmediate(() => callback(null, 'mock output'));
+            }
+        } else {
+            if (typeof callback === 'function') {
+                setImmediate(() => callback(new Error()));
+            }
         }
 
         return {} as ChildProcess;
@@ -130,6 +138,28 @@ describe('shell function', () => {
         });
     });
 
+    it('passes execution options to the exec function, when invoked without callback', () => {
+        const interpreter = '/bin/interpreter';
+
+        const shellTag = shell(interpreter);
+
+        const script = shellTag`echo "message"`;
+
+        const options: ExecOptions = {
+            cwd: '/usr/some/directory',
+            killSignal: 1000,
+            maxBuffer: 500,
+        };
+
+        script.execAsync({ options });
+
+        expect(exec).toHaveBeenLastCalledWith(`echo "message"`,
+                                              {
+                                                  ...options,
+                                                  shell: interpreter,
+                                              });
+    });
+
     it('invokes the callback when invoked without parameters', (done) => {
         const interpreter = '/bin/interpreter';
 
@@ -152,18 +182,77 @@ describe('shell function', () => {
         });
     });
 
-    it('returns a valid promise, when invoked via promisify', () => {
+    it('returns a valid promise, when invoked via promisify', async () => {
         const interpreter = '/bin/interpreter';
 
         const shellTag = shell(interpreter);
 
-        const script = promisify(shellTag`echo "message"`);
+        await expect(promisify(shellTag`echo "message"`)())
+            .resolves.toEqual('mock output');
 
-        return script().then((stdout) => {
-            expect(stdout).toEqual('mock output');
-            expect(exec).toHaveBeenLastCalledWith(`echo "message"`,
-                                                  { shell: interpreter },
-                                                  expect.anything());
-        });
+        expect(exec).toHaveBeenLastCalledWith(`echo "message"`, { shell: interpreter }, expect.anything());
+    });
+
+    it('rejects the promise if shell command fails, when invoked via promisify without parameters', async () => {
+        execShouldFail = true;
+
+        await expect(promisify(shell`echo "message"`)())
+            .rejects.toThrow();
+    });
+
+    it('rejects the promise if shell command fails, when invoked via promisify with parameters', async () => {
+        execShouldFail = true;
+
+        await expect(promisify(shell<{ arg: string }>`echo "message"`)({ arg: '' }))
+            .rejects.toThrow();
+    });
+
+    it('resolves the promise if shell command succeeds, when invoked via promisify with parameters', async () => {
+        execShouldFail = false;
+
+        await expect(promisify(shell<{ arg: string }>`echo "message"`)({ arg: '' }))
+            .resolves.toMatch('mock output');
+    });
+
+    it(`correctly formats parameters passed using selector ('array') notation`, () => {
+        const script = shell<{
+            booleanTrueFlag: boolean;
+            booleanFalseFlag: boolean;
+            numericParameter: number;
+            stringParameter: string;
+        }>`command ${ [ 'booleanTrueFlag', 'booleanFalseFlag', 'numericParameter', 'stringParameter' ] }`;
+
+        const output = script.execSync({
+            booleanTrueFlag: true,
+            booleanFalseFlag: false,
+            numericParameter: 100,
+            stringParameter: 'some string',
+        }).toString();
+
+        expect(output).toEqual('mock output');
+        expect(execSync)
+            .toHaveBeenLastCalledWith(`command --boolean-true-flag --numeric-parameter 100 --string-parameter "some string"`, { 'shell': '/bin/sh' });
+    });
+
+    it(`throws TypeError when invoked with an argument other than a string literal`, async () => {
+        expect(() => shell([] as unknown as TemplateStringsArray))
+            .toThrow(TypeError);
+    });
+
+    it(`correctly substitutes variables from external scope`, async () => {
+        const value = 'value';
+
+        shell`echo ${ value }`.execSync();
+
+        expect(execSync)
+            .toHaveBeenLastCalledWith(`echo value`, { 'shell': '/bin/sh' });
+    });
+
+    it(`correctly substitutes function arguments`, async () => {
+        shell<{ argument: string }>`echo ${ ({ argument }): string => argument }`
+            .execSync({ argument: 'value' });
+
+        expect(execSync)
+            .toHaveBeenLastCalledWith(`echo value`, { 'shell': '/bin/sh' });
     });
 });

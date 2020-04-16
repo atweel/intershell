@@ -7,7 +7,7 @@
 # https://github.com/microsoft/vscode-dev-containers/tree/v0.106.0/containers/typescript-node-12/.devcontainer/Dockerfile
 FROM atweel/vscode-devcontainer-typescript-node:12
 
-ARG USERNAME=developer
+ARG USERNAME=user
 ARG USER_UID=1001
 ARG USER_GID=$USER_UID
 
@@ -23,6 +23,7 @@ RUN apt-get update && \
     curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "/tmp/awscliv2.zip" && \
     unzip /tmp/awscliv2.zip -d /tmp/awscliv2 && \
     /tmp/awscliv2/aws/install && \
+    apt-get -y install jq && \
     groupadd -g ${USER_GID} ${USERNAME} && \
     useradd ${USERNAME} -u ${USER_UID} -g ${USER_GID} && \
     passwd -d ${USERNAME} && \

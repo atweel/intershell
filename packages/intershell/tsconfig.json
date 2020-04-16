@@ -5,14 +5,21 @@
       "rootDir": "sources/",                  
       "baseUrl": "sources/",
       "paths": {
-        "constants": ["constants"]
-      }
+        "constants": ["constants"],
+        "utils": ["utils"],
+        "primitives": ["primitives"]
+      },
+      "plugins": [
+        {
+          "transform": "@zerollup/ts-transform-paths"
+        }
+      ]
     },
     "include": [
       "sources/**/*.ts"
     ],
     "exclude": [
-      "sources/**/*/spec.ts"
+      "sources/**/*.spec.ts"
     ]
   }
   
