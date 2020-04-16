@@ -5,9 +5,9 @@
     "build": "yarn build:packages",
     "build:packages": "ttsc --build packages.tsconfig.json",
     "watch": "ttsc --build --watch packages.tsconfig.json",
-    "clean": "yarn clean:internals && yarn clean:common",
-    "clean:internals": "lerna exec --parallel 'cat ./tsconfig.json | jq .compilerOptions.outDir | xargs -I {} rm -rf {}'",
-    "clean:common": "find . \\( -name \\*.tsbuildinfo -o -name \\*.log ! -path ./node_modules/\\* \\) | xargs -I {} rm -rf {}",
+    "clean": "yarn clean:outputs && yarn clean:common",
+    "clean:outputs": "lerna exec --parallel 'cat ./tsconfig.json | jq .compilerOptions.outDir | xargs -I {} rm -rf {}'",
+    "clean:common": "find . \\( -name \\*.tsbuildinfo -o -name \\*.log -o  -name coverage ! -path ./node_modules/\\* \\) | xargs -I {} rm -rf {}",
     "rebuild": "yarn build",
     "prerebuild": "yarn clean",
     "lint": "eslint --ext .ts .",
@@ -15,14 +15,15 @@
     "test": "jest --coverage",
     "pretest": "yarn build",
     "test:changes": "jest --onlyChanged",
-    "test:unit": "jest --rootDir $WORKSPACE --projects=\"packages/intershell\" --passWithNoTests --coverage",
-    "integrate": "yarn lint && yarn rebuild && yarn test",
+    "test:unit": "jest --rootDir $WORKSPACE --projects=\"package\" --passWithNoTests --coverage",
+    "integrate": "yarn lint && yarn rebuild && yarn test && yarn primer",
     "prepack": "yarn integrate",
-    "primer": "ts-node --dir packages/primer sources/entrypoint.ts",
+    "primer": "ts-node --dir primer sources/entrypoint.ts",
     "preprimer": "yarn build"
   },
   "workspaces": [
-    "packages/**/*"
+    "package",
+    "primer"
   ],
   "devDependencies": {
     "@types/command-exists": "^1.2.0",
@@ -30,14 +31,11 @@
     "@typescript-eslint/parser": "^2.25.0",
     "command-exists": "^1.2.8",
     "eslint": "^6.8.0",
-    "eslint-plugin-react": "^7.19.0",
     "husky": "^4.2.3",
     "jest": "^25.2.4",
-    "jest-runner-tsc": "^1.6.0",
+    "ts-jest": "^25.3.0",
     "lerna": "^3.14.1",
-    "node-dev": "^4.0.0",
     "ts-node": "^8.8.1",
-    "ts-node-dev": "^1.0.0-pre.44",
     "ttypescript": "^1.5.7",
     "typescript": "^3.5.3"
   }

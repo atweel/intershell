@@ -1,16 +1,18 @@
 {
-  "name": "@atweel/intershell",
+  "name": "@atweel/intershell-primer",
   "version": "1.0.0-beta.5",
-  "description": "A package that allows for describing linux shell scripts inside Javascript/TypeScript code and invoking them drirectly from Node.js applications.",
+  "description": "> TODO: description",
   "author": "Eduard Malakhov <eduard@atweel.com>",
   "homepage": "https://github.com/atweel/intershell#readme",
   "license": "ISC",
-  "main": "library/exports.js",
+  "main": "application/entrypoint.js",
+  "private": true,
   "directories": {
-    "lib": "library"
+    "lib": "lib",
+    "test": "__tests__"
   },
   "files": [
-    "library"
+    "lib"
   ],
   "publishConfig": {
     "access": "public"
@@ -28,19 +30,17 @@
   "devDependencies": {
     "@types/debug": "^4.1.5",
     "@types/jest": "^25.1.4",
+    "@types/lodash": "^4.14.149",
     "@typescript-eslint/eslint-plugin": "^2.24.0",
     "@typescript-eslint/parser": "^2.24.0",
-    "@zerollup/ts-transform-paths": "^1.7.17",
     "eslint": "^6.8.0",
-    "jest": "^25.2.4",
-    "ts-jest": "^25.3.0",
-    "typemoq": "^2.1.0",
     "typescript": "^3.8.3",
     "typescript-eslint": "^0.0.1-alpha.0"
   },
   "dependencies": {
-    "debug": "^4.1.1",
-    "param-case": "^3.0.3",
-    "reflect-metadata": "^0.1.13"
+    "@atweel/intershell": "^1.0.0-beta.5",
+    "command-exists": "^1.2.8",
+    "lodash": "^4.17.15",
+    "yargs": "^15.3.1"
   }
 }

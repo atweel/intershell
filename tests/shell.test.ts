@@ -2,6 +2,7 @@ import 'jest';
 import { promisify } from 'util';
 
 import { shell, SUPPORTED_INTERPRETERS } from '@atweel/intershell';
+import commandExists from 'command-exists';
 
 describe(`'${ shell.name }' template literal tag...`, function () {
     describe('...when applied without parameters...', function () {
@@ -241,7 +242,7 @@ describe(`'${ shell.name }' template literal tag...`, function () {
 
     describe(`...when set up with a supported interpreter...`, function () {
         for (const interpreter of SUPPORTED_INTERPRETERS) {
-            it(`...executes a script via ${ interpreter }`, function () {
+            (commandExists.sync(interpreter) ? it : it.skip)(`...executes a script via ${ interpreter }`, function () {
                 const script = shell(interpreter)`echo SHELL = $0`;
 
                 return new Promise((resolve, reject) => {

@@ -5,7 +5,7 @@ let execShouldFail = false;
 import { execSync, exec, ChildProcess, ExecSyncOptions, ExecOptions } from 'child_process';
 import { promisify } from 'util';
 
-import { TAG_FUNCTION_METADATA_KEY } from './../../constants';
+import { TAG_FUNCTION_METADATA_KEY } from '../../constants';
 import { shell } from './shell';
 
 import 'reflect-metadata';
@@ -157,7 +157,8 @@ describe('shell function', () => {
                                               {
                                                   ...options,
                                                   shell: interpreter,
-                                              });
+                                              },
+                                              undefined);
     });
 
     it('invokes the callback when invoked without parameters', (done) => {

@@ -1,12 +1,12 @@
 {
-    "extends": "../../default.tsconfig.json",
+    "extends": "../default.tsconfig.json",
     "compilerOptions": {
-      "outDir": "./library/",                   
-      "rootDir": "sources/",                  
-      "baseUrl": "sources/",
+      "outDir": "library",
+      "rootDir": "sources",
+      "baseUrl": "sources",
       "paths": {
         "constants": ["constants"],
-        "utils": ["utils"],
+        "utils": ["internals/utils"],
         "primitives": ["primitives"]
       },
       "plugins": [

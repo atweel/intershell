@@ -5,10 +5,10 @@ const tsConfigPath = path.join(process.cwd(), 'tsconfig');
 module.exports = {
     projects: [
         "<rootDir>",
-        "<rootDir>/packages/*"
+        "<rootDir>/package"
     ],
     testMatch: [ '<rootDir>/tests/*.test.ts' ],
-    modulePaths: [ '<rootDir>/packages/*' ],
+    modulePaths: [ '<rootDir>/package' ],
     preset: 'ts-jest',
     globals: {
         'ts-jest': {    
