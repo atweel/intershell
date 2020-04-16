@@ -7,7 +7,7 @@
     "watch": "ttsc --build --watch packages.tsconfig.json",
     "clean": "yarn clean:internals && yarn clean:common",
     "clean:internals": "lerna exec --parallel 'cat ./tsconfig.json | jq .compilerOptions.outDir | xargs -I {} rm -rf {}'",
-    "clean:common": "find . \\( -name \\*.tsbuildinfo -o -name \\*.log ! -path ./node_modules/\\* \\) | xargs -I {} rm -rf {}",
+    "clean:common": "find . \\( -name \\*.tsbuildinfo -o -name \\*.log -o  -name coverage ! -path ./node_modules/\\* \\) | xargs -I {} rm -rf {}",
     "rebuild": "yarn build",
     "prerebuild": "yarn clean",
     "lint": "eslint --ext .ts .",
