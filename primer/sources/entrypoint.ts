@@ -67,7 +67,7 @@ const warning = `<!---
     Last update on ${ new Date().toUTCString() }.
 --->`;
 
-const readmeFilePath = path.resolve(__dirname, '../../readme.md');
+const readmeFilePath = path.resolve(__dirname, '../../package/readme.md');
 
 const readme = exampleFiles.reduce((text, filePath) => {
     const exampleName = path.basename(filePath, '.ts');

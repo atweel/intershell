@@ -40,6 +40,7 @@
   "dependencies": {
     "@atweel/intershell": "^1.0.0-alpha.6",
     "command-exists": "^1.2.8",
-    "lodash": "^4.17.15"
+    "lodash": "^4.17.15",
+    "yargs": "^15.3.1"
   }
 }
