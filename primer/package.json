@@ -1,6 +1,6 @@
 {
   "name": "@atweel/intershell-primer",
-  "version": "1.0.0-alpha.7",
+  "version": "1.0.0-alpha.8",
   "description": "> TODO: description",
   "author": "Eduard Malakhov <eduard@atweel.com>",
   "homepage": "https://github.com/atweel/intershell#readme",
@@ -38,7 +38,7 @@
     "typescript-eslint": "^0.0.1-alpha.0"
   },
   "dependencies": {
-    "@atweel/intershell": "^1.0.0-alpha.7",
+    "@atweel/intershell": "^1.0.0-alpha.8",
     "command-exists": "^1.2.8",
     "lodash": "^4.17.15",
     "yargs": "^15.3.1"
