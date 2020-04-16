@@ -8,16 +8,16 @@ Intershell is a utility package that allows developers to write and execute linu
 
 ### Repository structure and tools
 
-This repostitory is structured as a [`lerna`](https://www.npmjs.com/packages/lerna) monorepo that contains two packages. The `package` directory contains source code of the Intershell package itself, while the `primer` directory contains an auxillary `intershell-primer` package that is used to showcase the features of Intershell and generating code samples for documentation. For the purpose of development and testing, the following tools and packages are included as development dependencies:
-- [`yarn`](https://www.npmjs.com/packages/yarn) is the package manager we use,
-- [`command-exists`](https://www.npmjs.com/packages/command-exists) is used in the `intershell-primer` package to find out which interpreters are available on the system,
-- [`eslint`](https://www.npmjs.com/packages/eslint) with [`@typescript-eslint/parser`](https://www.npmjs.com/packages/@typescript-eslint/parser) and [`@typescript-eslint/eslint-plugin`](https://www.npmjs.com/packages/@typescript-eslint/eslint-plugin) is the linting tool of our choice,
-- [`husky`](https://www.npmjs.com/packages/husky) is used to configure and run git hooks, specifically the `pre-commit` hook that is used for building and testing packages prior to commit,
-- [`jest`](https://www.npmjs.com/packages/jest) with [`ts-jest`](https://www.npmjs.com/packages/ts-jest) preset is our tool for unit and integration testing,
-- [`lerna`](https://www.npmjs.com/packages/lerna), as mentioned, is used to organize the repository,
-- [`ts-node` ](https://www.npmjs.com/packages/ts-node)is used to run primer without preeliminary transpilation,
-- [`typescript`](https://www.npmjs.com/packages/typescript) is the standard compiler for TypeScript, and finally
-- [`ttypescript`](https://www.npmjs.com/packages/ttypescript) is a wrapper on top of [`typescript`](https://www.npmjs.com/packages/typescript) that adds support for applying code transformations during transpilation process.
+This repostitory is structured as a [`lerna`](https://www.npmjs.com/package/lerna) monorepo that contains two packages. The `package` directory contains source code of the Intershell package itself, while the `primer` directory contains an auxillary `intershell-primer` package that is used to showcase the features of Intershell and generating code samples for documentation. For the purpose of development and testing, the following tools and packages are included as development dependencies:
+- [`yarn`](https://www.npmjs.com/package/yarn) is the package manager we use,
+- [`command-exists`](https://www.npmjs.com/package/command-exists) is used in the `intershell-primer` package to find out which interpreters are available on the system,
+- [`eslint`](https://www.npmjs.com/package/eslint) with [`@typescript-eslint/parser`](https://www.npmjs.com/package/@typescript-eslint/parser) and [`@typescript-eslint/eslint-plugin`](https://www.npmjs.com/package/@typescript-eslint/eslint-plugin) is the linting tool of our choice,
+- [`husky`](https://www.npmjs.com/package/husky) is used to configure and run git hooks, specifically the `pre-commit` hook that is used for building and testing packages prior to commit,
+- [`jest`](https://www.npmjs.com/package/jest) with [`ts-jest`](https://www.npmjs.com/package/ts-jest) preset is our tool for unit and integration testing,
+- [`lerna`](https://www.npmjs.com/package/lerna), as mentioned, is used to organize the repository,
+- [`ts-node` ](https://www.npmjs.com/package/ts-node)is used to run primer without preeliminary transpilation,
+- [`typescript`](https://www.npmjs.com/package/typescript) is the standard compiler for TypeScript, and finally
+- [`ttypescript`](https://www.npmjs.com/package/ttypescript) is a wrapper on top of [`typescript`](https://www.npmjs.com/package/typescript) that adds support for applying code transformations during transpilation process.
 
 In this repository, we aim to automate as many routine operations as possible.
 
@@ -28,7 +28,7 @@ We prefer [VS Code](https://code.visualstudio.com/) with [`devcontainer`](https:
 ### Getting started with the repository
 
 After you've cloned the repository, you will nened to run `lerna bootstrap` command to install dependencies and cross-link repository packages. 
-If you're developing with VS Code against a [`devcontainer`](https://code.visualstudio.com/docs/remote/containers), [`lerna`](https://www.npmjs.com/packages/lerna) is available insdide the cotnainer out of the box. Otherwise, you need to have [`lerna`](https://www.npmjs.com/packages/lerna) installed globally on your development machine.
+If you're developing with VS Code against a [`devcontainer`](https://code.visualstudio.com/docs/remote/containers), [`lerna`](https://www.npmjs.com/package/lerna) is available insdide the cotnainer out of the box. Otherwise, you need to have [`lerna`](https://www.npmjs.com/package/lerna) installed globally on your development machine.
 
 ### Building the packages
 
