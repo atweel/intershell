@@ -2,10 +2,7 @@
     "compilerOptions": {               
       "rootDir": ".",                  
       "baseUrl": ".",
-      "esModuleInterop": true,
-      "paths": {
-        "intershell": ["packages/intershell"]
-      }
+      "esModuleInterop": true
     },
     "include": [
       "sources/**/*.ts",

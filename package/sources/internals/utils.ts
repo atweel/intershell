@@ -1,6 +1,6 @@
 import { paramCase } from 'param-case';
 
-import { ShellArgument, ShellArguments } from './primitives';
+import { ShellArgument, ShellArguments } from 'primitives';
 
 const escape = (value: string): string => value.replace(/(?<!\\)"/g, `\\"`);
 

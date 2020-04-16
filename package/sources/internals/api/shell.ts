@@ -5,10 +5,10 @@ import {
     ChildProcess,
 } from 'child_process';
 import 'reflect-metadata';
-import debugFactory from 'debug';
+import debuggerFactory from 'debug';
 import { promisify, CustomPromisifySymbol } from 'util';
 
-const debug = debugFactory('intershell');
+const debug = debuggerFactory('intershell');
 
 import {
     DEFAULT_INTERPRETER,
@@ -21,13 +21,12 @@ import {
     ExecAsyncCallback,
     ShellArgument,
     ShellArguments,
-    ShellArgumentSelectorExpression,
     ShellArgumentBinding,
     ScriptExecutionParameters,
     ShellArgumentSelector,
-} from '../../primitives';
+} from 'primitives';
 
-import { projectShellArguments } from '../../utils';
+import { projectShellArguments } from 'utils';
 
 type PromisifySymbol<A extends ShellArguments> = Partial<A> extends A
     ? CustomPromisifySymbol<{
@@ -59,15 +58,6 @@ type ShellCommandFunction<A extends ShellArguments> = AsynchronousShellCommandFu
     execAsync: AsynchronousShellCommandFunction<A>;
     compile: (parameters?: A) => string;
 }
-
-// interface ShellCommandFunction<A extends ShellArguments> extends CustomPromisifySymbol<ShellCommandFunctionWithPromise<A>> {
-//     (callback?: ExecAsyncCallback): Optional<A> extends A ? ChildProcess : never;
-//     (parameters: ScriptExecutionParameters<'async', A>, callback?: ExecAsyncCallback): ChildProcess;
-//     execSync(): Optional<A> extends A ? Buffer : never;
-//     execSync(parameters: ScriptExecutionParameters<'sync', A>): Buffer;
-//     execAsync(callback?: ExecAsyncCallback): Optional<A> extends A ? ChildProcess : never;
-//     execAsync(parameters: ScriptExecutionParameters<'async', A>, callback?: ExecAsyncCallback): ChildProcess;
-// }
 
 interface ShellTagFunction<A extends ShellArguments> {
     (strings: TemplateStringsArray, ...parameters: any[]): ShellCommandFunction<A>;
@@ -104,7 +94,7 @@ function shell<A extends ShellArguments = {}>(arg1: string | TemplateStringsArra
                         ? (args: Partial<A> = {}): ShellArgument => projectShellArguments(args, binding)
                         : ((): ShellArgument => binding));
 
-            const compileScript = (parameters?: A): string => scriptParts
+            const compileScript = (parameters: A | undefined): string => scriptParts
                 .map((str, index) => str + (expressions[index]?.(parameters || {}) || ''))
                 .join('')
                 .trim();
@@ -116,52 +106,29 @@ function shell<A extends ShellArguments = {}>(arg1: string | TemplateStringsArra
             }
 
             function asyncCommandFunction(callback?: ExecAsyncCallback): ChildProcess;
-            function asyncCommandFunction(parameters: ScriptExecutionParameters<'async', A>, callback?: ExecAsyncCallback): ChildProcess;
+            function asyncCommandFunction(parameters: ScriptExecutionParameters<'async', A> | undefined, callback?: ExecAsyncCallback): ChildProcess;
             function asyncCommandFunction(...args: any[]): ChildProcess {
-                if (args.length === 2) {
-                    const script = compileScript(args[0]);
+                const parameters = typeof args[0] === 'object' ? args[0] : undefined;
+                const callback = args.length === 2 ? args[1] : typeof args[0] === 'function' ? args[0] : undefined;
 
-                    debug(`Executing script '${ traceScript(script) }...'" in asyncronous mode with a callback...`);
+                const script = compileScript(parameters);
 
-                    return exec(script, { ...args[0].options, shell: interpreter }, args[1]);
-                } else {
-                    if (typeof args[0] === 'object') {
-                        const script = compileScript(args[0]);
+                debug(`Executing script '${ traceScript(script) }...'" in asyncronous mode with${ callback ? '' : 'out' } a callback...`);
 
-                        debug(`Executing script '${ traceScript(script) }...'" in asyncronous mode without a callback...`);
-
-                        return exec(script, { ...args[0].options, shell: interpreter });
-                    } else {
-                        const script = compileScript();
-
-                        debug(`Executing script '${ traceScript(script) }...'" in asyncronous mode with a callback...`);
-
-                        return exec(script, { shell: interpreter }, args[0]);
-                    }
-                }
+                return exec(script, { ...parameters?.options, shell: interpreter }, callback);
             }
 
             function asyncCommandFunctionWithPromise(): Promise<string | Buffer>;
             function asyncCommandFunctionWithPromise(parameters: ScriptExecutionParameters<'async', A>): Promise<string | Buffer>;
             function asyncCommandFunctionWithPromise(parameters?: ScriptExecutionParameters<'async', A>): Promise<string | Buffer> {
                 return new Promise((resolve, reject) => {
-                    if (parameters) {
-                        asyncCommandFunction(parameters, (error, stdout) => {
-                            if (error) {
-                                reject(error);
-                            } else {
-                                resolve(stdout);
-                            }
-                        });
-                    } else {
-                        asyncCommandFunction((error, stdout) => {
-                            if (error) {
-                                reject(error);
-                            } else {
-                                resolve(stdout);
-                            }
-                        });
-                    }
+                    asyncCommandFunction(parameters, (error, stdout) => {
+                        if (error) {
+                            reject(error);
+                        } else {
+                            resolve(stdout);
+                        }
+                    });
                 });
             }
 

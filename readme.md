@@ -7,7 +7,7 @@ Intershell is a utility package that allows for linux shell scripts to be embedd
 <!---example:basic:begin--->
 <!---
     The code sample below was generated automatically by the primer utility; do not edit.
-    Last update on Thu, 16 Apr 2020 01:45:56 GMT.
+    Last update on Thu, 16 Apr 2020 03:25:02 GMT.
 --->
 ```typescript
 // Source code:
@@ -41,7 +41,7 @@ As noted previously, when intershell executes scripts, it uses `/bin/sh` as the 
 <!---example:custom-interpreter:begin--->
 <!---
     The code sample below was generated automatically by the primer utility; do not edit.
-    Last update on Thu, 16 Apr 2020 01:45:56 GMT.
+    Last update on Thu, 16 Apr 2020 03:25:02 GMT.
 --->
 ```typescript
 // Source code:
@@ -71,7 +71,7 @@ For convenience, intershell package provides shortcuts for the four most used in
 <!---example:shortcuts:begin--->
 <!---
     The code sample below was generated automatically by the primer utility; do not edit.
-    Last update on Thu, 16 Apr 2020 01:45:56 GMT.
+    Last update on Thu, 16 Apr 2020 03:25:02 GMT.
 --->
 ```typescript
 // Source code:
@@ -134,7 +134,7 @@ As already stated, Intershell scripts are executed asynchronously by default. To
 <!---example:synchronous:begin--->
 <!---
     The code sample below was generated automatically by the primer utility; do not edit.
-    Last update on Thu, 16 Apr 2020 01:45:56 GMT.
+    Last update on Thu, 16 Apr 2020 03:25:02 GMT.
 --->
 ```typescript
 // Source code:
@@ -160,7 +160,7 @@ For the sake of API symmetry, Intershell script functions also expose the `execA
 <!---example:asynchronous-explicit:begin--->
 <!---
     The code sample below was generated automatically by the primer utility; do not edit.
-    Last update on Thu, 16 Apr 2020 01:45:56 GMT.
+    Last update on Thu, 16 Apr 2020 03:25:02 GMT.
 --->
 ```typescript
 // Source code:
@@ -192,7 +192,7 @@ Intershell scripts support promises via the standard `promisify` mechanism from 
 <!---example:promises:begin--->
 <!---
     The code sample below was generated automatically by the primer utility; do not edit.
-    Last update on Thu, 16 Apr 2020 01:45:56 GMT.
+    Last update on Thu, 16 Apr 2020 03:25:02 GMT.
 --->
 ```typescript
 // Source code:
@@ -220,7 +220,7 @@ As with regular interpolated template literals, one can use variables that are i
 <!---example:parameters:begin--->
 <!---
     The code sample below was generated automatically by the primer utility; do not edit.
-    Last update on Thu, 16 Apr 2020 01:45:56 GMT.
+    Last update on Thu, 16 Apr 2020 03:25:02 GMT.
 --->
 ```typescript
 // Source code:

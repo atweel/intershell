@@ -1,6 +1,6 @@
 const DEFAULT_INTERPRETER = '/bin/sh';
 
-const SUPPORTED_INTERPRETERS = [ '/bin/sh', '/bin/bash', '/bin/dash' ];
+const SUPPORTED_INTERPRETERS = [ DEFAULT_INTERPRETER, '/bin/bash', '/bin/dash', '/bin/zsh' ];
 
 const TAG_FUNCTION_METADATA_KEY = 'atweel:soft-shells:tag-function';
 
