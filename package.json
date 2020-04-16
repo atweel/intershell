@@ -17,7 +17,7 @@
     "test:changes": "jest --onlyChanged",
     "test:unit": "jest --rootDir $WORKSPACE --projects=\"packages/intershell\" --passWithNoTests --coverage",
     "integrate": "yarn lint && yarn rebuild && yarn test",
-    "prepack": "integrate",
+    "prepack": "yarn integrate",
     "primer": "ts-node --dir packages/primer sources/entrypoint.ts",
     "preprimer": "yarn build"
   },
