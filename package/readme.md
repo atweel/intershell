@@ -239,8 +239,7 @@ console.log(script.execSync({ name: 'Megan' }).toString());
 
 ## Dependencies
 
-As of version 1.0.0, intershell has only two runtime dependencies: [`debug`](https://www.npmjs.com/package/debug) and 
-[`reflect-metadata`](https://www.npmjs.com/package/reflect-metadata). Please note, that `reflect-metadata` API is not yet standardized and may change in the future.
+As of version [`1.0.0.beta-6`](https://www.npmjs.com/package/@atweel/intershell/v/1.0.0-beta.6), `intershell` has three runtime dependencies: [`debug`](https://www.npmjs.com/package/debug), [`param-case`](https://www.npmjs.com/package/param-case), and [`reflect-metadata`](https://www.npmjs.com/package/reflect-metadata). Please note that at the time of writing, the `reflect-metadata` API is not yet standardized and may change in the future which might require potentially breaking changes in `intershell`.
 
 ## Contributing
 
