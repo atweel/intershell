@@ -1,4 +1,5 @@
 ![Validation on master](https://github.com/atweel/intershell/workflows/Integrate%20master%20branch/badge.svg?branch=master&event=push)
+[![codecov](https://codecov.io/gh/atweel/intershell/branch/master/graph/badge.svg)](https://codecov.io/gh/atweel/intershell)
 
 # Intershell
 
