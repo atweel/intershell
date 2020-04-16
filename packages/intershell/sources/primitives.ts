@@ -16,15 +16,17 @@ interface ShellArguments {
     [key: string]: ShellArgument;
 }
 
-type ShellArgumentSelectorExpression<A> = (a: A | undefined) => ShellArgument;
+type ShellArgumentSelectorExpression<A> = (a: A) => ShellArgument;
 type ShellArgumentIndexerExpression<A> = (keyof A)[];
 type ShellArgumentExpression<A> = ShellArgumentSelectorExpression<A> | ShellArgumentIndexerExpression<A>;
 
+type ShellArgumentSelector<A> = (a: Partial<A>) => ShellArgument;
+
 type ShellArgumentBinding<A> = ShellArgument | ShellArgumentExpression<A>;
 
-type ScriptExecutionParameters<M extends ShellInvocationMode, A extends ShellArguments> = A & {
+type ScriptExecutionParameters<M extends ShellInvocationMode, A extends ShellArguments> = (Readonly<A> extends A ? A | undefined : A) & {
     options?: ShellExecOptions<M>;
-}
+};
 
 export {
     ShellInvocationMode,
@@ -37,4 +39,5 @@ export {
     ShellArgumentExpression,
     ShellArgumentBinding,
     ScriptExecutionParameters,
+    ShellArgumentSelector,
 };

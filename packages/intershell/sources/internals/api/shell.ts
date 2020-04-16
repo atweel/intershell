@@ -24,9 +24,10 @@ import {
     ShellArgumentSelectorExpression,
     ShellArgumentBinding,
     ScriptExecutionParameters,
-} from 'primitives';
+    ShellArgumentSelector,
+} from '../../primitives';
 
-import { projectShellArguments } from 'utils';
+import { projectShellArguments } from '../../utils';
 
 type PromisifySymbol<A extends ShellArguments> = Partial<A> extends A
     ? CustomPromisifySymbol<{
@@ -78,6 +79,8 @@ function assertTypeTemplateStringsArray(obj: any): asserts obj is TemplateString
     }
 }
 
+const traceScript = (script: string): string => script.trim().split('\n')[0];
+
 function shell<A extends ShellArguments = {}>(interpreter: string): ShellTagFunction<A>;
 function shell<A extends ShellArguments = {}>(interpreter: string, mode: ShellInvocationMode): ShellTagFunction<A>;
 function shell<A extends ShellArguments = {}>(strings: TemplateStringsArray, ...bindings: ShellArgumentBinding<A>[]): ShellCommandFunction<A>;
@@ -88,21 +91,23 @@ function shell<A extends ShellArguments = {}>(arg1: string | TemplateStringsArra
         const tagFunction = (scriptParts: TemplateStringsArray, ...bindings: ShellArgumentBinding<A>[]): ShellCommandFunction<A> => {
             assertTypeTemplateStringsArray(scriptParts);
 
-            const expressions: ShellArgumentSelectorExpression<A>[] = bindings
+            if (bindings && bindings.length > 0) {
+                debug(`The script contains ${ bindings.length } binding(s):\n\t${ bindings.map((binding) => binding?.toString()).join(`,\n\t`) }`);
+            } else {
+                debug(`The script contains no bindings.`);
+            }
+
+            const expressions: ShellArgumentSelector<A>[] = bindings
                 .map((binding) => typeof binding === 'function'
-                    ? binding
+                    ? (a: Partial<A>): ShellArgument => binding(a as A)
                     : Array.isArray(binding)
                         ? (args: Partial<A> = {}): ShellArgument => projectShellArguments(args, binding)
-                        : (): ShellArgument => binding);
+                        : ((): ShellArgument => binding));
 
-            const compileScript = (parameters?: A): string => {
-                const resolveArgument = (index: number): string => '' + (expressions[index]?.(parameters) || '');
-
-                return scriptParts
-                    .map((str, index) => str + resolveArgument(index))
-                    .join('')
-                    .trim();
-            };
+            const compileScript = (parameters?: A): string => scriptParts
+                .map((str, index) => str + (expressions[index]?.(parameters || {}) || ''))
+                .join('')
+                .trim();
 
             function syncCommandFunction(): Buffer;
             function syncCommandFunction(parameters: ScriptExecutionParameters<'sync', A>): Buffer;
@@ -116,24 +121,23 @@ function shell<A extends ShellArguments = {}>(arg1: string | TemplateStringsArra
                 if (args.length === 2) {
                     const script = compileScript(args[0]);
 
-                    debug(`Executing script '${ script.split('\n')[0] }...'" in asyncronous mode with a callback...`);
+                    debug(`Executing script '${ traceScript(script) }...'" in asyncronous mode with a callback...`);
 
-                    return exec(script, { ...args[0]?.options, shell: interpreter }, args[1]);
+                    return exec(script, { ...args[0].options, shell: interpreter }, args[1]);
                 } else {
                     if (typeof args[0] === 'object') {
                         const script = compileScript(args[0]);
 
-                        debug(`Executing script '${ script.split('\n')[0] }...'" in asyncronous mode without a callback...`);
+                        debug(`Executing script '${ traceScript(script) }...'" in asyncronous mode without a callback...`);
 
-                        return exec(script, { shell: interpreter });
+                        return exec(script, { ...args[0].options, shell: interpreter });
                     } else {
                         const script = compileScript();
 
-                        debug(`Executing script '${ script.split('\n')[0] }...'" in asyncronous mode with a callback...`);
+                        debug(`Executing script '${ traceScript(script) }...'" in asyncronous mode with a callback...`);
 
                         return exec(script, { shell: interpreter }, args[0]);
                     }
-
                 }
             }
 

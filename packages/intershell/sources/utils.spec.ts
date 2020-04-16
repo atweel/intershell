@@ -1,6 +1,6 @@
 import 'jest';
 
-import { formatShellArgument } from 'utils';
+import { formatShellArgument } from './utils';
 
 describe('utils', () => {
     describe('formatShellArgument', () => {

@@ -1,6 +1,5 @@
 {
-    "compilerOptions": {
-      "outDir": "./library",                   
+    "compilerOptions": {               
       "rootDir": ".",                  
       "baseUrl": ".",
       "esModuleInterop": true,

@@ -1,7 +1,7 @@
 import 'reflect-metadata';
 import commandExists from 'command-exists';
 
-import * as shells from 'intershell';
+import * as shells from '@atweel/intershell';
 
 const shortcuts = Object.entries(shells)
     .filter(([ name, value ]) => typeof value === 'function' && name !== 'shell')

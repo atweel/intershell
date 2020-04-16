@@ -19,7 +19,7 @@
       "sources/**/*.ts"
     ],
     "exclude": [
-      "sources/**/*/spec.ts"
+      "sources/**/*.spec.ts"
     ]
   }
   

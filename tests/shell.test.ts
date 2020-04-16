@@ -1,7 +1,7 @@
 import 'jest';
 import { promisify } from 'util';
 
-import { shell, SUPPORTED_INTERPRETERS } from 'intershell';
+import { shell, SUPPORTED_INTERPRETERS } from '@atweel/intershell';
 
 describe(`'${ shell.name }' template literal tag...`, function () {
     describe('...when applied without parameters...', function () {
