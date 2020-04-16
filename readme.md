@@ -8,7 +8,7 @@ Intershell is a utility package that allows developers to write and execute linu
 
 ### Repository structure and tools
 
-This repostitory is structured as a `lerna` monorepo that contains two packages. The `package` directory contains source code of the Intershell package itself, while the `primer` directory contains an auxillary `intershell-primer` package that is used to showcase the features of Intershell and generating code samples for documentation. For the purpose of development and testing, the following tools and packages are included as development dependencies:
+This repostitory is structured as a [`lerna`](https://www.npmjs.com/packages/lerna) monorepo that contains two packages. The `package` directory contains source code of the Intershell package itself, while the `primer` directory contains an auxillary `intershell-primer` package that is used to showcase the features of Intershell and generating code samples for documentation. For the purpose of development and testing, the following tools and packages are included as development dependencies:
 - [`yarn`](https://www.npmjs.com/packages/yarn) is the package manager we use,
 - [`command-exists`](https://www.npmjs.com/packages/command-exists) is used in the `intershell-primer` package to find out which interpreters are available on the system,
 - [`eslint`](https://www.npmjs.com/packages/eslint) with [`@typescript-eslint/parser`](https://www.npmjs.com/packages/@typescript-eslint/parser) and [`@typescript-eslint/eslint-plugin`](https://www.npmjs.com/packages/@typescript-eslint/eslint-plugin) is the linting tool of our choice,
@@ -28,7 +28,7 @@ We prefer [VS Code](https://code.visualstudio.com/) with [`devcontainer`](https:
 ### Getting started with the repository
 
 After you've cloned the repository, you will nened to run `lerna bootstrap` command to install dependencies and cross-link repository packages. 
-If you're developing with VS Code against a [`devcontainer`](https://code.visualstudio.com/docs/remote/containers), `lerna` is available insdide the cotnainer out of the box. Otherwise, you need to have `lerna` installed globally on your development machine.
+If you're developing with VS Code against a [`devcontainer`](https://code.visualstudio.com/docs/remote/containers), [`lerna`](https://www.npmjs.com/packages/lerna) is available insdide the cotnainer out of the box. Otherwise, you need to have [`lerna`](https://www.npmjs.com/packages/lerna) installed globally on your development machine.
 
 ### Building the packages
 
