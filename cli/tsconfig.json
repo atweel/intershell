@@ -1,0 +1,26 @@
+{
+    "extends": "../default.tsconfig.json",
+    "compilerOptions": {
+      "lib": ["ES2020.String"],
+      "outDir": "application",
+      "rootDir": "sources",
+      "baseUrl": "sources",
+      "paths": {
+        "constants": ["constants"],
+        "utils": ["internals/utils"],
+        "primitives": ["primitives"]
+      },
+      "plugins": [
+        {
+          "transform": "@zerollup/ts-transform-paths"
+        }
+      ]
+    },
+    "include": [
+      "sources/**/*.ts"
+    ],
+    "exclude": [
+      "sources/**/*.spec.ts"
+    ]
+  }
+  

@@ -3,6 +3,7 @@ module.exports = {
   ignorePatterns: [
     "node_modules/", 
     "library/", 
+    "application/", 
     "lib/",
     "app/", 
     "tests/hooks", 

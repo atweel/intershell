@@ -1,6 +1,7 @@
 {
     "references": [
-        { "path": "package" }
+        { "path": "package" },
+        { "path": "cli" }
     ],
     "exclude": [
         "*"

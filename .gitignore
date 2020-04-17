@@ -1,5 +1,6 @@
 node_modules/
 library/
+application/
 coverage/
 app/
 *.tsbuildinfo

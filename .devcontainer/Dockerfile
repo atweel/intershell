@@ -23,7 +23,7 @@ RUN apt-get update && \
     curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "/tmp/awscliv2.zip" && \
     unzip /tmp/awscliv2.zip -d /tmp/awscliv2 && \
     /tmp/awscliv2/aws/install && \
-    apt-get -y install jq && \
+    apt-get -y install jq groff && \
     groupadd -g ${USER_GID} ${USERNAME} && \
     useradd ${USERNAME} -u ${USER_UID} -g ${USER_GID} && \
     passwd -d ${USERNAME} && \
@@ -34,4 +34,3 @@ RUN apt-get update && \
 RUN yarn global add typescript lerna jest
 
 USER ${USERNAME}
-

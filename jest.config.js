@@ -5,7 +5,8 @@ const tsConfigPath = path.join(process.cwd(), 'tsconfig');
 module.exports = {
     projects: [
         "<rootDir>",
-        "<rootDir>/package"
+        "<rootDir>/package",
+        "<rootDir>/cli"
     ],
     testMatch: [ '<rootDir>/tests/*.test.ts' ],
     modulePaths: [ '<rootDir>/package' ],
